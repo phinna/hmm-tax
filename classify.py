@@ -7,13 +7,13 @@ def seperate_taxonomy_list(OtuFiles):
     for OF in OtuFiles:
         FilePath='./gg_12_10_otus/taxonomy/'
         f=open(FilePath+OF,'r')
-	wk=open('k_taxonomy1.txt','a')
-        wp=open('p_taxonomy1.txt','a')
-	wc=open('c_taxonomy1.txt','a')
-	wo=open('o_taxonomy1.txt','a')
-	wf=open('f_taxonomy1.txt','a')
-	wg=open('g_taxonomy1.txt','a')
-	ws=open('s_taxonomy1.txt','a')
+	wk=open('k_taxonomy.txt','a')
+        wp=open('p_taxonomy.txt','a')
+	wc=open('c_taxonomy.txt','a')
+	wo=open('o_taxonomy.txt','a')
+	wf=open('f_taxonomy.txt','a')
+	wg=open('g_taxonomy.txt','a')
+	ws=open('s_taxonomy.txt','a')
       
 	for line in f:
 	    
