@@ -43,11 +43,17 @@ def seperate_taxonomy_list(OtuFiles):
 	wg.close()
 	ws.close()
 
-OtuFiles=['61_otu_taxonomy.txt','64_otu_taxonomy.txt','67_otu_taxonomy.txt','70_otu_taxonomy.txt',
+def main():
+
+    OtuFiles=['61_otu_taxonomy.txt','64_otu_taxonomy.txt','67_otu_taxonomy.txt','70_otu_taxonomy.txt',
           '73_otu_taxonomy.txt','76_otu_taxonomy.txt','79_otu_taxonomy.txt','82_otu_taxonomy.txt',
           '85_otu_taxonomy.txt','88_otu_taxonomy.txt','88_otu_taxonomy.txt','91_otu_taxonomy.txt',
           '94_otu_taxonomy.txt','97_otu_taxonomy.txt','99_otu_taxonomy.txt']
 
-seperate_taxonomy_list(OtuFiles)
+    seperate_taxonomy_list(OtuFiles)
+
+
+if __name__=="__main__":
+    main()
 
 
