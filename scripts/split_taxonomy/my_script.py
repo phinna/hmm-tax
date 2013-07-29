@@ -11,8 +11,8 @@ __maintainer__ = "Huanhua Huang"
 __email__ = "hhh34@nau.edu"
 __status__ = "Development"
 
-from hmmtax.classify import seperate_taxonomy_list
-from  hmmtax.assign_taxonomy import assign_seqID_to_seqs
+from hmmtax.split_taxonomy import seperate_taxonomy_list
+from  hmmtax.assign_seq_to_taxon import assign_seqID_to_seqs
 from qcli import (parse_command_line_parameters, 
                   make_option)
 
@@ -57,11 +57,11 @@ def main():
     
     sub_taxonomy_list=[]
     if opts.taxonomy_level=="":
-        sub_taxonomy=seperate_taxonomy_list(opts.input_taxonomy_fps,'7')
+        sub_taxonomy=seperate_taxonomy_list(opts.input_taxonomy_fps,'7',opts.output_dir)
         sub_taxonomy_list.append(sub_taxonomy)
         assign_seqID_to_seqs(sub_taxonomy_list,opts.input_fasta_fps,opts.output_dir)
     else:
-        sub_taxonomy=seperate_taxonomy_list(opts.input_taxonomy_fps,opts.taxonomy_level)
+        sub_taxonomy=seperate_taxonomy_list(opts.input_taxonomy_fps,opts.taxonomy_level,opts.output_dir)
         sub_taxonomy_list.append(sub_taxonomy)
         assign_seqID_to_seqs(sub_taxonomy_list,opts.input_fasta_fps,opts.output_dir)
   
