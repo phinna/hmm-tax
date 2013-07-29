@@ -1,4 +1,4 @@
-import unittest
+iport unittest
 from qiime.util import get_tmp_filename
 from cogent.util.misc import remove_files
 from seq import unique_taxonomy_collection
