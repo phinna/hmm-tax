@@ -11,8 +11,8 @@ __maintainer__ = "Huanhua Huang"
 __email__ = "hhh34@nau.edu"
 __status__ = "Development"
 
-from data.classify import seperate_taxonomy_list
-from  data.assign_taxonomy import assign_seqID_to_seqs
+from hmmtax.classify import seperate_taxonomy_list
+from  hmmtax.assign_taxonomy import assign_seqID_to_seqs
 from qcli import (parse_command_line_parameters, 
                   make_option)
 
