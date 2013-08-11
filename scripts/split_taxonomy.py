@@ -10,8 +10,8 @@ __version__ = "0.0.0"
 __maintainer__ = "Huanhua Huang"
 __email__ = "hhh34@nau.edu"
 __status__ = "Development"
-import os
-from os import mkdir
+
+from os import mkdir,path
 from hmmtax.split_taxonomy import split_taxonomy_list
 from hmmtax.assign_seq_to_taxon import assign_seqID_to_seqs
 from qcli import (parse_command_line_parameters, 
