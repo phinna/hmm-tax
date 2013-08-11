@@ -1,36 +1,32 @@
+#!/usr/bin/env python
 ##################################################
 # Topic: Match each sequence ID to its           #
 #	 corresponding nucleotide sequence       #
 #                                                #
 ##################################################
-#!/usr/bin/env python
-from os import mkdir
+import os
 
-def unique_taxonomy_collection(taxonomy_file,output_dir):    
+def unique_taxonomy_collection(taxonomy_file):    
    
-    f1=open('./'+output_dir+'/'+taxonomy_file)
-    
     taxonomy_collection=[]
-    
-    for taxonomy in f1:
-	ID=taxonomy.split()[0]
-        name=taxonomy.split()[1]
-        count=0
-        for i in taxonomy_collection:
-	    if i==name:
-	        count+=1 
-        if count==0:
-            taxonomy_collection.append(name)
-    
-    f1.close()
-    
+    for taxonomy in taxonomy_file:
+        if taxonomy=='.':
+            break
+    	else:
+	    ID=taxonomy.split('\t')[0]
+            name=taxonomy.split('\t')[1]
+            count=0
+            for unique in taxonomy_collection:
+                if unique==name:
+	            count+=1 
+            if count==0:
+                taxonomy_collection.append(name)
     return taxonomy_collection
 	
-def classify_seqID(taxonomy_file,taxonomy_collection,output_dir):
+def classify_seqID(taxonomy_collection,splitted_taxonomy_file):
     
-    f1=open('./'+output_dir+'/'+taxonomy_file)
-    for taxonomy in f1:
-        ID_name=taxonomy.split()
+    for taxonomy in splitted_taxonomy_file:
+        ID_name=taxonomy.split('\t')
         n=0
         for element in taxonomy_collection:
 	    if type(element)==list:
@@ -57,7 +53,6 @@ def classify_seqID(taxonomy_file,taxonomy_collection,output_dir):
 	    else:
 	        n+=1
 	        continue
-    
     return taxonomy_collection
 
 
@@ -95,31 +90,36 @@ def pick_seqID_from_list(taxonomy,tgroup_list):
 	    continue
     return seqID
 
-def at_fasta_file(ID_NucleoSeq,output_dir,tf_dir,taxonomy_name):
+def at_fasta_file(ID_NucleoSeq,output_fp):
     """
     """
     if len(ID_NucleoSeq)!=0:
-        result_path="./"+output_dir+"/"+tf_dir
-        output_f=open(result_path+'/'+taxonomy_name+'.fasta','w')
+        output_f=open(output_fp,'w')
 	for i in range(0,len(ID_NucleoSeq)):
 	    if (i%2)==0:
 	        output_f.write('>'+ID_NucleoSeq[i]+'\n')
 	    else:
 		output_f.write(ID_NucleoSeq[i]+'\n')
     	output_f.close()
-    
+   	 
 
 def assign_seqID_to_seqs(taxonomy_files,otu_files,output_dir): 
 
-    for tf in taxonomy_files:   
-        utc=unique_taxonomy_collection(tf,output_dir)
-        utc1=unique_taxonomy_collection(tf,output_dir)	
-        tgroup_list=classify_seqID(tf,utc,output_dir)
+    
+    for tf in taxonomy_files:
+        
+        path_to_taxonomy_file=os.path.join(output_dir,tf)
+        utc=unique_taxonomy_collection(open(path_to_taxonomy_file,'U'))
+        utc1=unique_taxonomy_collection(open(path_to_taxonomy_file,'U'))
+        
+        path_to_splitted_taxonomy_file=os.path.join(output_dir,tf)
+        tgroup_list=classify_seqID(utc,open(path_to_splitted_taxonomy_file,'U'))
+        
         tf_dir=tf.rstrip('.txt')
-	mkdir("./"+output_dir+"/"+tf_dir+"/",0755)
+	os.mkdir(output_dir+"/"+tf_dir+"/",0755)
         
         for i in utc1:
-	    taxonomy_name=i.rstrip(';')
+	    taxonomy_name=i.rstrip(';\n')
 	    seqID_list=pick_seqID_from_list(i,tgroup_list)
 	    ID_NucleoSeq=[]
             for seqID in seqID_list:
@@ -129,7 +129,8 @@ def assign_seqID_to_seqs(taxonomy_files,otu_files,output_dir):
 		    ID_NucleoSeq.append(nucleotide_seq)
 	        else:
 		    continue
-            at_fasta_file(ID_NucleoSeq,output_dir,tf_dir,taxonomy_name)
+            output_taxonomy_fp=os.path.join(output_dir,tf_dir,taxonomy_name+'.fasta')
+	    at_fasta_file(ID_NucleoSeq,output_taxonomy_fp)
 
 
 def main():
@@ -139,456 +140,9 @@ def main():
                '73_otus.fasta','76_otus.fasta','79_otus.fasta','82_otus.fasta',
                '85_otus.fasta','88_otus.fasta','91_otus.fasta','94_otus.fasta',
                '97_otus.fasta','99_otus.fasta']
-    assign_seqID_to_seqs(taxonomy_files,otu_files) 
+    assign_seqID_to_seqs(taxonomy_files,otu_files,output_dir) 
   
 if __name__=="__main__":
     main()
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    

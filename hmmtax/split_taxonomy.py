@@ -1,36 +1,33 @@
+#!/usr/bin/env python
 ################################################
-# Topic: Classify taxonomy into several groups #
+# Topic: Split  taxonomy into different levels #
 #        and store in several files.           #
 #                                              #
 ################################################
-#!/usr/bin/env python
-from os import mkdir
 
-def seperate_taxonomy_list(OtuFiles,taxonomy_level,output_dir):
+def split_taxonomy_list(OtuFiles,taxonomy_level,output_dir):
     split_taxonomy={'7':'k_taxonomy.txt','6':'p_taxonomy.txt','5':'c_taxonomy.txt',
                     '4':'o_taxonomy.txt','3':'f_taxonomy.txt','2':'g_taxonomy.txt',
                     '1':'s_taxonomy.txt'} 
-    mkdir("./"+output_dir,0755)
 
     for OF in OtuFiles:
         
-	#FilePath='./gg_12_10_otus/taxonomy/'
-        f=open(OF,'r')
+        f=open(OF,'U')
         
 	if taxonomy_level=='7':
-	    wk=open("./"+output_dir+'/k_taxonomy.txt','a')
+	    wk=open(output_dir+'/k_taxonomy.txt','a')
         elif taxonomy_level=='6':
-            wp=open("./"+output_dir+'/p_taxonomy.txt','a')
+            wp=open(output_dir+'/p_taxonomy.txt','a')
         elif taxonomy_level=='5':
-            wc=open("./"+output_dir+'/c_taxonomy.txt','a')
+            wc=open(output_dir+'/c_taxonomy.txt','a')
         elif taxonomy_level=='4':
-	    wo=open("./"+output_dir+'/o_taxonomy.txt','a')
+	    wo=open(output_dir+'/o_taxonomy.txt','a')
         elif taxonomy_level=='3':
-	    wf=open("./"+output_dir+'/f_taxonomy.txt','a')
+	    wf=open(output_dir+'/f_taxonomy.txt','a')
 	elif taxonomy_level=='2':
-	    wg=open('./'+output_dir+'/g_taxonomy.txt','a')
+	    wg=open(output_dir+'/g_taxonomy.txt','a')
         elif taxonomy_level=='1':
-	    ws=open('./'+output_dir+'/s_taxonomy.txt','a')
+	    ws=open(output_dir+'/s_taxonomy.txt','a')
       
 	for line in f:
 	    taxonomy_list=line.split()
@@ -70,7 +67,7 @@ def seperate_taxonomy_list(OtuFiles,taxonomy_level,output_dir):
 	    wf.close()
 	elif taxonomy_level=='2':
 	    wg.close()
-	elif taxonomy_level=='1':
+        elif taxonomy_level=='1':
 	    ws.close()
     return split_taxonomy[taxonomy_level]
 
@@ -81,7 +78,8 @@ def main():
           #'85_otu_taxonomy.txt','88_otu_taxonomy.txt','88_otu_taxonomy.txt','91_otu_taxonomy.txt',
           #'94_otu_taxonomy.txt','97_otu_taxonomy.txt','99_otu_taxonomy.txt']
     taxonomy_level='6'
-    seperate_taxonomy_list(OtuFiles,taxonomy_level)
+    output_dir='IDseq'
+    split_taxonomy_list(OtuFiles,taxonomy_level,output_dir)
 
 
 if __name__=="__main__":
