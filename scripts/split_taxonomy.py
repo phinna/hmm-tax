@@ -21,13 +21,13 @@ from qcli import (parse_command_line_parameters,
 taxonomy_levels=['1','2','3','4','5','6','7']
 
 script_info = {}
-script_info['brief_description'] = "Split taxonomy and match sequence ID to its corresponding nucleotide sequence at specific taxonomy level"
-script_info['script_description'] = "This script split taxonomy into different taxonomy levels and match sequence ID to its corresponding nucleotide sequence at specified taxonomy level. The output file shows the sequence ID and its nucleotide sequence at specific taxonomy level under its own taxonomy directory "
+script_info['brief_description'] = "Split taxonomy by level and match the otu ID to the corresponding nucleotide sequence at each specific taxonomy level"
+script_info['script_description'] = "This script splits taxonomy into different taxonomy levels and matches the otu ID to its corresponding nucleotide sequence at a specified taxonomic level. The output file contains the sequence ID and its nucleotide sequence at specific taxonomy level under its own taxonomy directory "
 script_info['script_usage'] = [\
-("Split taxonomy and match destinctive sequence ID to its corresponding nucleotide sequence at specified taxonomy level in one file.",
- "Split taxonomy in one taxonomy file and match destinctive sequence ID to its corresponding nucleotide sequence based on a fasta file, which corresponds to its taxonom  y file at specified taxonomy level, like phylum level.  Write the results to each t  axonomy file based on their characteristics",
+("Split taxonomy and match the distinct sequence ID to its corresponding nucleotide sequence at a specified taxonomy level in one file.",
+ "Split taxonomy in a taxonomy file and match the distinct sequence ID to its corresponding nucleotide sequence based on the fasta file, which corresponds to the taxonomy file at a specified taxonomy level, for instance: Phylum. Write the results to each taxonomy file based on each otu level",
   "%prog -t ./gg_12_10_otus/taxonomy/61_otu_taxonomy.txt -f ./gg_12_10_otus/rep_set/61_otus.fasta -l 6_-o IDseq"),
-("Split taxonomy and match destinctive sequence ID to its corresponding nucleotide sequence at specified taxonomy level in two files.",
+("Split taxonomy and match the distinct sequence ID to its corresponding nucleotide sequence at specified taxonomy level in two files.",
  "Split taxonomy in two taxonomy files and match destinctive sequence ID to its corresponding nucleotide sequence based on two fasta files, which correspond to their taxonomy files  at specified taxonomy level, like phylum taxonomy level. Write the results to each taxonomy file based on their characteristics.",
 "%prog -t ./gg_12_10_otus/taxonomy/61_otu_taxonomy.txt,./gg_12_10_otus/taxonomy/64_otu_taxonomy.txt -f ./gg_12_10_otus/rep_set/61_otus.fasta,./gg_12_10_otus/rep_set/64_otus.fasta -o IDseq"),
 ("Split taxonomy and match destinctive sequence ID to its corresponding nucleotide sequence at specified taxonomy level in more than two files.",
