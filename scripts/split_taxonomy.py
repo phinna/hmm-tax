@@ -40,11 +40,11 @@ script_info['required_options'] = [
                    'its corresponding taxonomies'),
  make_option('-f','--input_fasta_fps',type="existing_filepaths",
              help='Input fasta files, which correspond its taxonomy files'),
- make_option('-l','--taxonomy_level',type='int',#"choices",
+ make_option('-l','--taxonomy_level',type='int',
              help='Split input files at the specific taxonomy level.'
                   ' Valid taxonomy levels are:'+\
                    ','.join(taxonomy_levels)+'[default: %default]',
-                   default=7),#choices=taxonomy_levels, default='7'),
+                   default=7),
  make_option('-o','--output_dir',type="new_dirpath",
              help='the output directory containing classified taxonomy directories')
 ]
