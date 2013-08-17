@@ -14,7 +14,7 @@ def split_taxonomy_list(OtuFiles,taxonomy_level,output_dir):
         
         f=open(OF,'U')
         
-	if taxonomy_level==7:
+        if taxonomy_level==7:
 	    wk=open(output_dir+'/k_taxonomy.txt','a')
         elif taxonomy_level==6:
             wp=open(output_dir+'/p_taxonomy.txt','a')
