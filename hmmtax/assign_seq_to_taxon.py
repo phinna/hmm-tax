@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 ##################################################
-# Topic: Match each sequence ID to its           #
+# Topic: Match each otu ID to its                #
 #	 corresponding nucleotide sequence       #
 #                                                #
 ##################################################
 import os
 
 def unique_taxonomy_collection(taxonomy_file):    
-   
+    """
+    Filter repeated otu IDs in a taxonomy file which is at a specified taxonomic level and return a list of a unique taxonomy collection.
+    """   
     taxonomy_collection=[]
     for taxonomy in taxonomy_file:
         if taxonomy=='.':
@@ -23,7 +25,10 @@ def unique_taxonomy_collection(taxonomy_file):
                 taxonomy_collection.append(name)
     return taxonomy_collection
 	
-def classify_seqID(taxonomy_collection,splitted_taxonomy_file):
+def classify_otuID(taxonomy_collection,splitted_taxonomy_file):
+    """
+    Classify otu IDs based on each taxonomy at a specified taxonomy level and return a list which conains otu IDs and the corresponding taxonomy.
+    """
     
     for taxonomy in splitted_taxonomy_file:
         ID_name=taxonomy.split('\t')
@@ -56,7 +61,10 @@ def classify_seqID(taxonomy_collection,splitted_taxonomy_file):
     return taxonomy_collection
 
 
-def count_same_seq(otu_files, identify_number):
+def pick_seq(otu_files, identify_number):
+    """
+    Return a nucleotide sequence which corresponds to the otu ID passed in this function.
+    """
     for i in range(len(otu_files)):
         f2=open(otu_files[i])
 	while 1:
@@ -79,19 +87,23 @@ def count_same_seq(otu_files, identify_number):
 
 
 
-def pick_seqID_from_list(taxonomy,tgroup_list):
-    seqID=[]
+def pick_otuID_from_list(taxonomy,tgroup_list):
+    """
+    Pick and return a otu ID from a list which contains a sequence of otu IDs under    a specified taxonomy group.
+    """
+    otuID=[]
     for n in range(0,len(tgroup_list)):
         if taxonomy==tgroup_list[n][0]:
 	    for j in range(1,len(tgroup_list[n])):
-		 seqID.append(tgroup_list[n][j])
+		 otuID.append(tgroup_list[n][j])
 	    break
         else:
 	    continue
-    return seqID
+    return otuID
 
 def at_fasta_file(ID_NucleoSeq,output_fp):
     """
+    Write the otu ID and its corresponding nucleotide sequence into a .fasta file. 
     """
     if len(ID_NucleoSeq)!=0:
         output_f=open(output_fp,'w')
@@ -103,7 +115,7 @@ def at_fasta_file(ID_NucleoSeq,output_fp):
     	output_f.close()
    	 
 
-def assign_seqID_to_seqs(taxonomy_files,otu_files,output_dir): 
+def assign_otuID_to_seqs(taxonomy_files,otu_files,output_dir): 
 
     
     for tf in taxonomy_files:
@@ -113,19 +125,19 @@ def assign_seqID_to_seqs(taxonomy_files,otu_files,output_dir):
         utc1=unique_taxonomy_collection(open(path_to_taxonomy_file,'U'))
         
         path_to_splitted_taxonomy_file=os.path.join(output_dir,tf)
-        tgroup_list=classify_seqID(utc,open(path_to_splitted_taxonomy_file,'U'))
+        tgroup_list=classify_otuID(utc,open(path_to_splitted_taxonomy_file,'U'))
         
         tf_dir=tf.rstrip('.txt')
 	os.mkdir(output_dir+"/"+tf_dir+"/",0755)
         
         for i in utc1:
 	    taxonomy_name=i.rstrip(';\n')
-	    seqID_list=pick_seqID_from_list(i,tgroup_list)
+	    otuID_list=pick_otuID_from_list(i,tgroup_list)
 	    ID_NucleoSeq=[]
-            for seqID in seqID_list:
-	        nucleotide_seq=count_same_seq(otu_files, seqID)
+            for otuID in otuID_list:
+	        nucleotide_seq=pick_seq(otu_files, otuID)
 	        if nucleotide_seq!='':
-	            ID_NucleoSeq.append(seqID)
+	            ID_NucleoSeq.append(otuID)
 		    ID_NucleoSeq.append(nucleotide_seq)
 	        else:
 		    continue
@@ -135,12 +147,12 @@ def assign_seqID_to_seqs(taxonomy_files,otu_files,output_dir):
 
 def main():
     
-    taxonomy_files=['c_taxonomy.txt','f_taxonomy.txt','g_taxonomy.txt','k_taxonomy.txt',                      'o_taxonomy.txt','p_taxonomy.txt','s_taxonomy.txt']
+    taxonomy_files=['c_taxonomy.txt','f_taxonomy.txt','g_taxonomy.txt','k_taxonomy.txt','o_taxonomy.txt','p_taxonomy.txt','s_taxonomy.txt']
     otu_files=['61_otus.fasta','64_otus.fasta','67_otus.fasta','70_otus.fasta',
                '73_otus.fasta','76_otus.fasta','79_otus.fasta','82_otus.fasta',
                '85_otus.fasta','88_otus.fasta','91_otus.fasta','94_otus.fasta',
                '97_otus.fasta','99_otus.fasta']
-    assign_seqID_to_seqs(taxonomy_files,otu_files,output_dir) 
+    assign_otuID_to_seqs(taxonomy_files,otu_files,output_dir) 
   
 if __name__=="__main__":
     main()

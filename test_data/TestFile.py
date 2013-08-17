@@ -5,9 +5,9 @@ from qiime.util import get_tmp_filename
 from cogent.util.misc import remove_files
 from tempfile import mkdtemp
 from hmmtax.assign_seq_to_taxon import unique_taxonomy_collection
-from hmmtax.assign_seq_to_taxon import classify_seqID
-from hmmtax.assign_seq_to_taxon import pick_seqID_from_list
-from hmmtax.assign_seq_to_taxon import count_same_seq,at_fasta_file,assign_seqID_to_seqs
+from hmmtax.assign_seq_to_taxon import classify_otuID
+from hmmtax.assign_seq_to_taxon import pick_otuID_from_list
+from hmmtax.assign_seq_to_taxon import pick_seq,at_fasta_file,assign_otuID_to_seqs
 from hmmtax.split_taxonomy import split_taxonomy_list
 
 c_taxonomy_lines=\
@@ -80,12 +80,15 @@ class SequenceTest(unittest.TestCase):
 
 	otu_file=open(self.otu_f,'w')
 	otu_match=open(self.otu_match_f,'w')
+	
 	otu_file.write(otus_taxonomy_strings)
 	otu_match.write(otu_strings)
+	
 	otu_file.close()
 	otu_match.close()
 		
     def tearDown(self):
+	
 	remove_files(set(self._paths_to_clean_up))
     
     def test_unique_taxonomy_collection(self):
@@ -97,7 +100,7 @@ class SequenceTest(unittest.TestCase):
 
     
 
-    def test_classify_seqID(self):
+    def test_classify_otuID(self):
         
 	taxonomy_collection=['c__AAG;','c__Alphaproteobacteria;','c__MBGB;',\
 			     'c__[Parvarchaea];','c__Gammaproteobacteria;',\
@@ -108,11 +111,11 @@ class SequenceTest(unittest.TestCase):
 		  ['c__[Parvarchaea];','3770699'],['c__Gammaproteobacteria;','229854'],\
 		  ['c__MHVG;','2335039'], ['c__Chloroplast;','3779572']]
 
-	actual=classify_seqID(taxonomy_collection,c_taxonomy_lines)
+	actual=classify_otuID(taxonomy_collection,c_taxonomy_lines)
         self.assertEqual(actual,expected)
 
     
-    def test_pick_seqID_from_list1(self):
+    def test_pick_otuID_from_list1(self):
 	
         tgroup_list=[['c__AAG;','2528843'],['c__Alphaproteobacteria;','2493663',\
 		   '822577','1837676','717487'],['c__MBGB;','1928988'],\
@@ -123,16 +126,16 @@ class SequenceTest(unittest.TestCase):
 
         expected=['2493663','822577','1837676','717487']
 
-	actual=pick_seqID_from_list(utc,tgroup_list)
+	actual=pick_otuID_from_list(utc,tgroup_list)
 	self.assertEqual(actual,expected)
 
-    def test_count_same_seq(self):
+    def test_pick_seq(self):
 	
 	otu_files=['../gg_12_10_otus/rep_set/61_otus.fasta']
 	identify_number='2493663'
 	expected="""ATGCTTAACACATGCAAGTCGAACAATTTGGGGCTATTGGAAGCTCCTAGCTTTGCAGCTTGTCTCTCTCTTTTGATAGGAGACTTTGATAATGAAGTGGCGAACGGGTGCGTAAGGCGTGGGAAATTCTGCCGGAGAGAAAGCTAACGAAGAGCACTCCTTGATGAGCCCGCGTAGTATTAGGTAGTTGGTTAGGTTACGGCTGACCAAGCCGATGATGCTTAGTTGATCTTTTCGGATGATCAGCCACACCGGGACTGAGACAAGGCCCGGACCCAGGATTGGGGCAGCAGTGGGGAATCTTGGACAATAGGCGCCAGCCCGATCCAGCAATCTTGCGTGATTTAGACTCGTAAGGAGCCCGCCGGAGTGCGGGGATCTAGGGCACTTTCGCTTGTAAAAGCTCTTTCAACGAGTATGCGATGATGACATGACTCGTGTAAGAAGCTCCGGCTAACTTCGTGCCAGCAGCCGCGGTAAGACGAAGGGGGCAAGTCTTTCTCGGAATGACTGGGCGTAAAGAGCATGTAGGCGGTCAGTCAAATTGGAGCGGAAAAGCGCCATACAGATGGTGAGGTGTTCCCAATAAGACTGACTTGGGTCAGATAAGGGAGAGTGGAATTTCGTAGGGAGTTGGAAGAACACCTAAATCTATGTAAGGCAGTCCTAAGGCGAAGGCAGCTCTCTAGGTCTATACCGACGCTAAATGTGCGAAAGCGTGGGTAGCAAACAGGATTAGAGACCCTGGTAGTCCACGCTGTCAACGATGAGTGTTAGCTGTTTGGTCGTGTGATCAGGAGCACAGCTAACGCGTGAAACACTCCGCCTGGGGAGTACAGTCGCAAGGCTGAAACTCAAAGGAATTGACGGGGGCCCGCATAAGCGGTGGAGCATGTGGTTTAATTCGATACAACGCGAAAGGATCTTACCAGCCTTTGAATATGAGATCGTAGGCAAGGAGACGGGGGAGTTTGAATAAGGGCCAATTATGATAAGAAGACGCTTCTACCCTAATCGCTCCCTCCAATTATGAAAAGAATGAGATCCCATACCTTTTTTCCTCGCGACTAGCCAGGAGGATGAAGCTTAGTACGCTTTCGTACAGGTGTTGCATGGCTGTCGTCAGTCCGTGTCGTGGGATGTCGGGTCAATTCCTATAACGGGCGAAACCCTTTTTTTGTGTTGCAGAACACGTGTATCCTAGGCTTCGGGATTCTAAGTGGTAATACAGAGGAGTATACCATAACCAGCCCATGAATTAGAGAGGGTGCGCGTCGCACTCACAAGAGACAGACGCTTATATGGTGTAGGAAGGTGGGGATGACGTCAAGTCCGCATGGTCCTTAAAGGCTGGGCCACACACGTGCTACAATGACAATTACAATGGGATGTGAAAACTGCACCCTCAAAGATTGTCGCAGTTCGGATTCCTCTCTGTAATTCGGGAGGATGAAGCAGGAATCGCTAGTAATCGCGGATTAGGATGCCGCGGTGAACTGAGAACCGGGTTTTGTACACACCGCCCGTCACACCCTGGGAATTGGTTTCGCCCTAAGCATCAACGCGGAGGTTGCCCATGACTTGCTTCTGGTTTCTTTGCCATGGAGTGTTCCTTGGCAGTCTTTGTTGGATACCACGGTGGGGTCTCTGACTGGGGTGAAGTCGTAACAAGGTAGCCGTAGGGGA
 """
-	actual=count_same_seq(otu_files, identify_number)
+	actual=pick_seq(otu_files, identify_number)
 	self.assertEqual(actual,expected)
 
     def test_at_fasta_file(self):
@@ -154,7 +157,7 @@ ATGCTTAACACATGCAAGTCGAACAATTTGGGGCTATTGGAAGCTCCTAGCTTTGCAGCTTGTCTCTCTCTTTTGATAGG
 	self.assertEqual(result.read(),expected)
 	result.close()
     
-    def test_assign_seqID_to_seqs(self):
+    def test_assign_otuID_to_seqs(self):
 	
 	expected="""\
 >822577
@@ -167,7 +170,7 @@ AAACAATTAAGAGTTTGATCCTGGCTCTGAGTGAATGCTAGCGGCATGCCTTACACATGCAAGTCGTACGAAATTAATAA
 
 
 	self.output_dir=mkdtemp(prefix='TaxonomyTest_')
-	taxonomy_level='5'
+	taxonomy_level=5
 	otu_f_list=[]
 	otu_match_list=[]
 	otu_f_list.append(self.otu_f)
@@ -176,7 +179,7 @@ AAACAATTAAGAGTTTGATCCTGGCTCTGAGTGAATGCTAGCGGCATGCCTTACACATGCAAGTCGTACGAAATTAATAA
 	sub_taxonomy_list=[]
 	sub_taxonomy=split_taxonomy_list(otu_f_list,taxonomy_level,self.output_dir)	
 	sub_taxonomy_list.append(sub_taxonomy)
-	assign_seqID_to_seqs(sub_taxonomy_list,otu_match_list,self.output_dir) 
+	assign_otuID_to_seqs(sub_taxonomy_list,otu_match_list,self.output_dir) 
 
 	output_taxon_fp=os.path.join(self.output_dir,'c_taxonomy','c__Alphaproteobacteria.fasta')
 	result=open(output_taxon_fp,'U')
