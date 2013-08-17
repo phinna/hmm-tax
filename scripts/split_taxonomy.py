@@ -58,12 +58,12 @@ def main():
     
     sub_taxonomy_list=[]
     if opts.taxonomy_level=="":
-	    mkdir(opts.output_dir,0755)
+        mkdir(opts.output_dir,0755)
         sub_taxonomy=split_taxonomy_list(opts.input_taxonomy_fps,7,opts.output_dir)
         sub_taxonomy_list.append(sub_taxonomy)
         assign_otuID_to_seqs(taxon_list,opts.input_fasta_fps,opts.output_dir)
     else:
-	    mkdir(opts.output_dir,0755)
+        mkdir(opts.output_dir,0755)
         sub_taxonomy=split_taxonomy_list(opts.input_taxonomy_fps,opts.taxonomy_level,opts.output_dir)
         sub_taxonomy_list.append(sub_taxonomy)
         assign_otuID_to_seqs(sub_taxonomy_list,opts.input_fasta_fps,opts.output_dir)

@@ -15,12 +15,12 @@ def unique_taxonomy_collection(taxonomy_file):
         if taxonomy=='.':
             break
     	else:
-	        ID=taxonomy.split('\t')[0]
+            ID=taxonomy.split('\t')[0]
             name=taxonomy.split('\t')[1]
             count=0
             for unique in taxonomy_collection:
                 if unique==name:
-	                count+=1 
+                    count+=1 
             if count==0:
                 taxonomy_collection.append(name)
     return taxonomy_collection
@@ -66,21 +66,21 @@ def pick_seq(otu_files, identify_number):
     """
     for i in range(len(otu_files)):
         f2=open(otu_files[i])
-	    while 1:
+        while 1:
     	    DNAline=f2.readline()
             if (DNAline.find('>')==0):
-        	    ID=DNAline.lstrip('>')
-		        newID=ID.rstrip()
-	            if identify_number==newID: 
-		            break
-		        else:
-	                continue
+                ID=DNAline.lstrip('>')
+                newID=ID.rstrip()
+                if identify_number==newID: 
+                    break
+                else:
+                    continue
     	    elif DNAline=='':
-		        break
+                break
     	    else:
-		        continue
-	    nucleotide_seq=f2.readline()
-	    break	
+                continue
+        nucleotide_seq=f2.readline()
+        break	
     f2.close()    
     return nucleotide_seq
 
@@ -91,11 +91,11 @@ def pick_otuID_from_list(taxonomy,tgroup_list):
     otuID=[]
     for n in range(0,len(tgroup_list)):
         if taxonomy==tgroup_list[n][0]:
-	        for j in range(1,len(tgroup_list[n])):
-		        otuID.append(tgroup_list[n][j])
-	        break
+            for j in range(1,len(tgroup_list[n])):
+                otuID.append(tgroup_list[n][j])
+            break
         else:
-	        continue
+            continue
     return otuID
 
 def at_fasta_file(ID_NucleoSeq,output_fp):
@@ -104,12 +104,12 @@ def at_fasta_file(ID_NucleoSeq,output_fp):
     """
     if len(ID_NucleoSeq)!=0:
         output_f=open(output_fp,'w')
-	    for i in range(0,len(ID_NucleoSeq)):
-	        if (i%2)==0:
-	            output_f.write('>'+ID_NucleoSeq[i]+'\n')
-	        else:
-		        output_f.write(ID_NucleoSeq[i]+'\n')
-    	output_f.close()
+        for i in range(0,len(ID_NucleoSeq)):
+            if (i%2)==0:
+                output_f.write('>'+ID_NucleoSeq[i]+'\n')
+            else:
+                output_f.write(ID_NucleoSeq[i]+'\n')
+        output_f.close()
    	 
 def assign_otuID_to_seqs(taxonomy_files,otu_files,output_dir): 
 
@@ -124,21 +124,21 @@ def assign_otuID_to_seqs(taxonomy_files,otu_files,output_dir):
         tgroup_list=classify_otuID(utc,open(path_to_splitted_taxonomy_file,'U'))
         
         tf_dir=tf.rstrip('.txt')
-	    os.mkdir(output_dir+"/"+tf_dir+"/",0755)
+        os.mkdir(output_dir+"/"+tf_dir+"/",0755)
         
         for i in utc1:
-	        taxonomy_name=i.rstrip(';\n')
-	        otuID_list=pick_otuID_from_list(i,tgroup_list)
-	        ID_NucleoSeq=[]
+            taxonomy_name=i.rstrip(';\n')
+            otuID_list=pick_otuID_from_list(i,tgroup_list)
+            ID_NucleoSeq=[]
             for otuID in otuID_list:
-	            nucleotide_seq=pick_seq(otu_files, otuID)
-	            if nucleotide_seq!='':
-	                ID_NucleoSeq.append(otuID)
-		            ID_NucleoSeq.append(nucleotide_seq)
-	            else:
-		            continue
+                nucleotide_seq=pick_seq(otu_files, otuID)
+                if nucleotide_seq!='':
+                    ID_NucleoSeq.append(otuID)
+                    ID_NucleoSeq.append(nucleotide_seq)
+                else:
+                    continue
             output_taxonomy_fp=os.path.join(output_dir,tf_dir,taxonomy_name+'.fasta')
-	        at_fasta_file(ID_NucleoSeq,output_taxonomy_fp)
+            at_fasta_file(ID_NucleoSeq,output_taxonomy_fp)
 
 
 def main():
