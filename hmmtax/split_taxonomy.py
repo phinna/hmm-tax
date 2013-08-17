@@ -15,41 +15,41 @@ def split_taxonomy_list(OtuFiles,taxonomy_level,output_dir):
         f=open(OF,'U')
         
         if taxonomy_level==7:
-	    wk=open(output_dir+'/k_taxonomy.txt','a')
+		    wk=open(output_dir+'/k_taxonomy.txt','a')
         elif taxonomy_level==6:
             wp=open(output_dir+'/p_taxonomy.txt','a')
         elif taxonomy_level==5:
             wc=open(output_dir+'/c_taxonomy.txt','a')
         elif taxonomy_level==4:
-	    wo=open(output_dir+'/o_taxonomy.txt','a')
+	        wo=open(output_dir+'/o_taxonomy.txt','a')
         elif taxonomy_level==3:
-	    wf=open(output_dir+'/f_taxonomy.txt','a')
-	elif taxonomy_level==2:
-	    wg=open(output_dir+'/g_taxonomy.txt','a')
+	        wf=open(output_dir+'/f_taxonomy.txt','a')
+        elif taxonomy_level==2:
+	        wg=open(output_dir+'/g_taxonomy.txt','a')
         elif taxonomy_level==1:
-	    ws=open(output_dir+'/s_taxonomy.txt','a')
+	        ws=open(output_dir+'/s_taxonomy.txt','a')
       
 	for line in f:
 	    taxonomy_list=line.split()
 	    if taxonomy_level==7:
  	        k_list=[taxonomy_list[0],'\t',taxonomy_list[1]]
-                wk.write(''.join(k_list)+'\n')
-            elif taxonomy_level==6:
-	    	p_list=[taxonomy_list[0],'\t',taxonomy_list[2]]
+            wk.write(''.join(k_list)+'\n')
+        elif taxonomy_level==6:
+            p_list=[taxonomy_list[0],'\t',taxonomy_list[2]]
   	        wp.write(''.join(p_list)+'\n')
-            elif taxonomy_level==5:
-                c_list=[taxonomy_list[0],'\t',taxonomy_list[3]]
+        elif taxonomy_level==5:
+            c_list=[taxonomy_list[0],'\t',taxonomy_list[3]]
   	        wc.write(''.join(c_list)+'\n')
-            elif taxonomy_level==4:
+        elif taxonomy_level==4:
   	        o_list=[taxonomy_list[0],'\t',taxonomy_list[4]]
 	        wo.write(''.join(o_list)+'\n')
-            elif taxonomy_level==3:
+        elif taxonomy_level==3:
   	        f_list=[taxonomy_list[0],'\t',taxonomy_list[5]]
 	        wf.write(''.join(f_list)+'\n')
-            elif taxonomy_level==2:
+        elif taxonomy_level==2:
   	        g_list=[taxonomy_list[0],'\t',taxonomy_list[6]]
 	        wg.write(''.join(g_list)+'\n')
-            elif taxonomy_level==1:
+        elif taxonomy_level==1:
         	s_list=[taxonomy_list[0],'\t',taxonomy_list[7]]
 	        ws.write(''.join(s_list)+'\n')
   	
@@ -67,7 +67,7 @@ def split_taxonomy_list(OtuFiles,taxonomy_level,output_dir):
 	    wf.close()
 	elif taxonomy_level==2:
 	    wg.close()
-        elif taxonomy_level==1:
+    elif taxonomy_level==1:
 	    ws.close()
     return split_taxonomy[taxonomy_level]
 
