@@ -11,9 +11,12 @@ __maintainer__ = "Huanhua Huang"
 __email__ = "hhh34@nau.edu"
 __status__ = "Development"
 
-from os import mkdir
+from os import mkdir,path
 from hmmtax.split_taxonomy import split_taxonomy_list
+from hmmtax.split_taxonomy import create_dictionary
 from hmmtax.assign_seq_to_taxon import assign_otuID_to_seqs
+from hmmtax.assign_seq_to_taxon import  build_hmm_models
+from qcli import qcli_system_call
 from qcli import (parse_command_line_parameters, 
                   make_option)
 
@@ -55,19 +58,31 @@ script_info['version'] = __version__
 def main():
     option_parser, opts, args =\
        parse_command_line_parameters(**script_info)
-    
+     
     sub_taxonomy_list=[]
+    dictionary=create_dictionary(opts.input_taxonomy_fps)
     if opts.taxonomy_level=="":
-        mkdir(opts.output_dir,0755)
-        sub_taxonomy=split_taxonomy_list(opts.input_taxonomy_fps,7,opts.output_dir)
-        sub_taxonomy_list.append(sub_taxonomy)
-        assign_otuID_to_seqs(taxon_list,opts.input_fasta_fps,opts.output_dir)
+        if path.isdir(opts.output_dir)==False:
+            mkdir(opts.output_dir,0755)
+            sub_taxonomy=split_taxonomy_list(opts.input_taxonomy_fps,7,opts.output_dir)
+            sub_taxonomy_list.append(sub_taxonomy)
+            assign_otuID_to_seqs(dictionary,sub_taxonomy_list,opts.input_fasta_fps,opts.output_dir)
+        else:
+            sub_taxonomy=split_taxonomy_list(opts.input_taxonomy_fps,7,opts.output_dir)
+            sub_taxonomy_list.append(sub_taxonomy)
+            assign_otuID_to_seqs(dictionary,sub_taxonomy_list,opts.input_fasta_fps,opts.output_dir)
     else:
-        mkdir(opts.output_dir,0755)
-        sub_taxonomy=split_taxonomy_list(opts.input_taxonomy_fps,opts.taxonomy_level,opts.output_dir)
-        sub_taxonomy_list.append(sub_taxonomy)
-        assign_otuID_to_seqs(sub_taxonomy_list,opts.input_fasta_fps,opts.output_dir)
-  
+        if path.isdir(opts.output_dir)==False:
+            mkdir(opts.output_dir,0755)
+            sub_taxonomy=split_taxonomy_list(opts.input_taxonomy_fps,opts.taxonomy_level,opts.output_dir)
+            sub_taxonomy_list.append(sub_taxonomy)
+            assign_otuID_to_seqs(dictionary,opts.input_taxonomy_fps,sub_taxonomy_list,opts.input_fasta_fps,opts.output_dir)
+        else:
+            sub_taxonomy=split_taxonomy_list(opts.input_taxonomy_fps,opts.taxonomy_level,opts.output_dir)
+            sub_taxonomy_list.append(sub_taxonomy)
+            assign_otuID_to_seqs(dictionary,opts.input_taxonomy_fps,sub_taxonomy_list,opts.input_fasta_fps,opts.output_dir)
+ 
+    build_hmm_models(opts.taxonomy_level,opts.output_dir)
 
 if __name__ == "__main__":
     main()

@@ -4,6 +4,23 @@
 #        and store in several files.           #
 #                                              #
 ################################################
+def create_dictionary(taxonomytxts):
+    pairs_list=[]
+    for taxonomytxt in taxonomytxts:
+        f=open(taxonomytxt,'U')
+        for line in f:
+            pairs_list.append((line.split()[2],line.split()[1]))
+            pairs_list.append((line.split()[3],line.split()[2]))
+            pairs_list.append((line.split()[4],line.split()[3]))
+            pairs_list.append((line.split()[5],line.split()[4]))
+            pairs_list.append((line.split()[6],line.split()[5]))
+            pairs_list.append((line.split()[7],line.split()[6]))
+        no_duplicate_list=list(set(pairs_list))
+        dictionary=dict(no_duplicate_list)
+    #print dictionary    
+    #print dictionary['Portiera;']
+    return dictionary
+
 
 def split_taxonomy_list(OtuFiles,taxonomy_level,output_dir):
     split_taxonomy={7:'k_taxonomy.txt',6:'p_taxonomy.txt',5:'c_taxonomy.txt',
@@ -73,13 +90,16 @@ def split_taxonomy_list(OtuFiles,taxonomy_level,output_dir):
 
 def main():
 
-    OtuFiles=['61_otu_taxonomy.txt']#,'64_otu_taxonomy.txt','67_otu_taxonomy.txt','70_otu_taxonomy.txt',
+    OtuFiles=['61_otu_taxonomy.txt','64_otu_taxonomy.txt','67_otu_taxonomy.txt','70_otu_taxonomy.txt']
           #'73_otu_taxonomy.txt','76_otu_taxonomy.txt','79_otu_taxonomy.txt','82_otu_taxonomy.txt',
           #'85_otu_taxonomy.txt','88_otu_taxonomy.txt','88_otu_taxonomy.txt','91_otu_taxonomy.txt',
           #'94_otu_taxonomy.txt','97_otu_taxonomy.txt','99_otu_taxonomy.txt']
-    taxonomy_level=6
-    output_dir='IDseq'
-    split_taxonomy_list(OtuFiles,taxonomy_level,output_dir)
+    
+    create_dictionary(OtuFiles)#open('../gg_12_10_otus/taxonomy/61_otu_taxonomy.txt','U'))
+    print search_dictionary(OtuFiles,'p__Crenarchaeota;')
+    #taxonomy_level=6
+    #output_dir='IDseq'
+    #split_taxonomy_list(OtuFiles,taxonomy_level,output_dir)
 
 
 if __name__=="__main__":
