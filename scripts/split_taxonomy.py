@@ -13,7 +13,8 @@ __status__ = "Development"
 
 from os import mkdir,path
 from hmmtax.split_taxonomy import split_taxonomy_list
-from hmmtax.split_taxonomy import create_dictionary
+from hmmtax.split_taxonomy import create_taxonomic_rank_dictionary
+from hmmtax.split_taxonomy import create_otu_dictionary
 from hmmtax.assign_seq_to_taxon import assign_otuID_to_seqs
 from hmmtax.assign_seq_to_taxon import  build_hmm_models
 from qcli import qcli_system_call
@@ -60,27 +61,28 @@ def main():
        parse_command_line_parameters(**script_info)
      
     sub_taxonomy_list=[]
-    dictionary=create_dictionary(opts.input_taxonomy_fps)
+    taxonomic_rank_dictionary=create_taxonomic_rank_dictionary(opts.input_taxonomy_fps)
+    otu_dictionary=create_otu_dictionary(opts.input_fasta_fps)
     if opts.taxonomy_level=="":
         if path.isdir(opts.output_dir)==False:
             mkdir(opts.output_dir,0755)
             sub_taxonomy=split_taxonomy_list(opts.input_taxonomy_fps,7,opts.output_dir)
             sub_taxonomy_list.append(sub_taxonomy)
-            assign_otuID_to_seqs(dictionary,sub_taxonomy_list,opts.input_fasta_fps,opts.output_dir)
+            assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,sub_taxonomy_list,opts.output_dir)
         else:
             sub_taxonomy=split_taxonomy_list(opts.input_taxonomy_fps,7,opts.output_dir)
             sub_taxonomy_list.append(sub_taxonomy)
-            assign_otuID_to_seqs(dictionary,sub_taxonomy_list,opts.input_fasta_fps,opts.output_dir)
+            assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,sub_taxonomy_list,opts.output_dir)
     else:
         if path.isdir(opts.output_dir)==False:
             mkdir(opts.output_dir,0755)
             sub_taxonomy=split_taxonomy_list(opts.input_taxonomy_fps,opts.taxonomy_level,opts.output_dir)
             sub_taxonomy_list.append(sub_taxonomy)
-            assign_otuID_to_seqs(dictionary,opts.input_taxonomy_fps,sub_taxonomy_list,opts.input_fasta_fps,opts.output_dir)
+            assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,sub_taxonomy_list,opts.output_dir)
         else:
             sub_taxonomy=split_taxonomy_list(opts.input_taxonomy_fps,opts.taxonomy_level,opts.output_dir)
             sub_taxonomy_list.append(sub_taxonomy)
-            assign_otuID_to_seqs(dictionary,opts.input_taxonomy_fps,sub_taxonomy_list,opts.input_fasta_fps,opts.output_dir)
+            assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,sub_taxonomy_list,opts.output_dir)
  
     build_hmm_models(opts.taxonomy_level,opts.output_dir)
 

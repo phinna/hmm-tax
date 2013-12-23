@@ -5,7 +5,9 @@
 #                                                #
 ##################################################
 import os
+import shelve
 import subprocess
+from tempfile import mkstemp
 from qcli import qcli_system_call
 
 def unique_taxa_collection_at_the_level(taxonomy_file):    
@@ -19,14 +21,14 @@ def unique_taxa_collection_at_the_level(taxonomy_file):
     	else:
             ID=line.split('\t')[0]
             name=line.split('\t')[1]
-            if name in ['k__;\n','p__;\n','o__;\n','c__;\n',
-                        'f__;\n','g__;\n','s__\n']:
+            if name in ['k__;\t','p__;\t','o__;\t','c__;\t',
+                        'f__;\t','g__;\t','s__\n']:
                 pass
             else:
                 name=name.rstrip(';\n')
                 t_collection_at_the_level.append(name)
     t_collection_at_the_level=list(set(t_collection_at_the_level))
-    #print t_collection_at_the_level
+    print t_collection_at_the_level
     return t_collection_at_the_level
 	
 def classify_otuID(taxonomy_collection,splitted_taxonomy_file):
@@ -62,34 +64,7 @@ def classify_otuID(taxonomy_collection,splitted_taxonomy_file):
     for t_string in new_t_collection:
         if type(t_string)==str:
             new_t_collection.remove(t_string) 
-    print new_t_collection
     return new_t_collection
-
-def pick_seq(otu_files, identify_number):
-    """
-    Return a nucleotide sequence which corresponds to the otu ID passed in this function.
-    """
-    for i in range(len(otu_files)):
-        f2=open(otu_files[i])
-        while 1:
-    	    DNAline=f2.readline()
-            if (DNAline.find('>')==0):
-                ID=DNAline.lstrip('>')
-                newID=ID.rstrip('\n')
-                if identify_number==newID:
-                    print identify_number 
-                    break
-                else:
-                    continue
-    	    elif DNAline=='':
-                break
-    	    else:
-                continue
-        nucleotide_seq=f2.readline()
-        break	
-    f2.close()    
-    print nucleotide_seq
-    return nucleotide_seq
 
 def pick_otuID_from_list(taxonomy,tgroup_list):
     """
@@ -109,7 +84,7 @@ def at_fasta_file(ID_NucleoSeq,output_fp):
     """
     Write the otu ID and its corresponding nucleotide sequence into a .fasta file. 
     """
-    if len(ID_NucleoSeq)!=0:
+    if len(ID_NucleoSeq)!=[]:
         output_f=open(output_fp,'w')
         for i in range(0,len(ID_NucleoSeq)):
             if (i%2)==0:
@@ -117,6 +92,8 @@ def at_fasta_file(ID_NucleoSeq,output_fp):
             else:
                 output_f.write(ID_NucleoSeq[i]+'\n')
         output_f.close()
+    else:
+        print 'No fasta file generated'
 
 def generate_sto_file(ID_NucleoSeq,output_fp):
     """
@@ -133,7 +110,7 @@ def generate_sto_file(ID_NucleoSeq,output_fp):
         output_f.write('//\n')
         output_f.close()
 
-def search_root(dictionary,output_dir,predecessor):
+def search_root(taxonomic_rank_dictionary,output_dir,predecessor):
     taxa_strings=[]
     if predecessor == output_dir:
         taxa_strings.append(output_dir)
@@ -145,20 +122,20 @@ def search_root(dictionary,output_dir,predecessor):
                 break
             else:
                 taxa_strings.append(predecessor)
-                predecessor=dictionary[predecessor]
+                predecessor=taxonomic_rank_dictionary[predecessor]
     return taxa_strings
 
-def search_dictionary(taxonomy_file,dictionary,search_t):
+def search_dictionary(taxonomy_file,taxonomic_rank_dictionary,search_t):
     if taxonomy_file == 's_taxonomy.txt':
         search_t=search_t.rstrip(';')
         try: 
-            predecessor=dictionary[search_t]
+            predecessor=taxonomic_rank_dictionary[search_t]
         except KeyError:
             search_t=search_t+';'
-            predecessor=dictionary[search_t]
+            predecessor=taxonomic_rank_dictionary[search_t]
     else:
         try: 
-            predecessor=dictionary[search_t]
+            predecessor=taxonomic_rank_dictionary[search_t]
         except KeyError:
             print "Oops! KeyError:",search_t
             predecessor='Wrong_taxa'
@@ -198,6 +175,7 @@ def build_hmm_models(level,output_dir):
                 #subprocess.call(['hmmbuild',path_to_hmm_list[i],path_to_sto_list[i]])
                 stdout,stderr,return_value = qcli_system_call('hmmbuild '+path_to_hmm_list[i]+' '+path_to_sto_list[i])
                 if return_value != 0:
+                    print path_to_sto_list[i]
                     print 'Stdout:\n%s\nStderr:%s\n' % (stdout,stderr)
                     exit(1)
             content=[]
@@ -217,9 +195,9 @@ def build_hmm_models(level,output_dir):
             pass
            	
  
-def assign_otuID_to_seqs(dictionary,taxonomy_fps,taxonomy_files,otu_files,output_dir): 
-
-    for tf in taxonomy_files:
+def assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,splitted_taxonomy_files,output_dir): 
+    otu_dictionary=shelve.open('otu_db',writeback=False)
+    for tf in splitted_taxonomy_files:
         path_to_splitted_taxonomy_file=os.path.join(output_dir,tf)
         utc1=unique_taxa_collection_at_the_level(open(path_to_splitted_taxonomy_file,'U'))
         tgroup_list=classify_otuID(utc1,open(path_to_splitted_taxonomy_file,'U'))
@@ -227,21 +205,23 @@ def assign_otuID_to_seqs(dictionary,taxonomy_fps,taxonomy_files,otu_files,output
             otuID_list=pick_otuID_from_list(taxa_name,tgroup_list)
             ID_NucleoSeq=[]
             for otuID in otuID_list:
-                nucleotide_seq=pick_seq(otu_files, otuID)
-                if nucleotide_seq!='':
+                nucleotide_seq=otu_dictionary[otuID]
+                #print (otuID,nucleotide_seq)
+                if nucleotide_seq!="":
                     ID_NucleoSeq.append(otuID)
                     ID_NucleoSeq.append(nucleotide_seq)
                 else:
+                    print "empty"
                     continue
-            
+            #otu_dictionary.sync()
             if taxa_name=='k__Bacteria':
                 predecessor=output_dir
             elif taxa_name=='k__Archaea':
                 predecessor=output_dir
             else:
-                predecessor=search_dictionary(tf,dictionary,taxa_name+';') 
+                predecessor=search_dictionary(tf,taxonomic_rank_dictionary,taxa_name+';') 
             
-            taxonomy_strings=search_root(dictionary,output_dir,predecessor)
+            taxonomy_strings=search_root(taxonomic_rank_dictionary,output_dir,predecessor)
             path_to_output_dir=taxa_strings_to_path(taxonomy_strings)
             if ID_NucleoSeq==[]:
                 pass
@@ -254,18 +234,19 @@ def assign_otuID_to_seqs(dictionary,taxonomy_fps,taxonomy_files,otu_files,output
                 at_fasta_file(ID_NucleoSeq,output_taxonomy_fp)
                 output_sto_fp=os.path.join(path_to_output_dir,taxa_name+'.sto')
                 generate_sto_file(ID_NucleoSeq,output_sto_fp)
-            
+                print 'generate fasta and sto file'
+    otu_dictionary.close()
 
 
 def main():
     
-    taxonomy_files=['c_taxonomy.txt','f_taxonomy.txt','g_taxonomy.txt',
+    splitted_taxonomy_files=['c_taxonomy.txt','f_taxonomy.txt','g_taxonomy.txt',
                     'k_taxonomy.txt','o_taxonomy.txt','p_taxonomy.txt','s_taxonomy.txt']
     otu_files=['61_otus.fasta','64_otus.fasta','67_otus.fasta','70_otus.fasta',
                '73_otus.fasta','76_otus.fasta','79_otus.fasta','82_otus.fasta',
                '85_otus.fasta','88_otus.fasta','91_otus.fasta','94_otus.fasta',
                '97_otus.fasta','99_otus.fasta']
-    assign_otuID_to_seqs(taxonomy_files,otu_files,output_dir) 
+    assign_otuID_to_seqs(splitted_taxonomy_files,otu_files,output_dir) 
   
 if __name__=="__main__":
     main()

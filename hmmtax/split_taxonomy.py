@@ -4,7 +4,10 @@
 #        and store in several files.           #
 #                                              #
 ################################################
-def create_dictionary(taxonomytxts):
+import shelve
+import os
+
+def create_taxonomic_rank_dictionary(taxonomytxts):
     pairs_list=[]
     for taxonomytxt in taxonomytxts:
         f=open(taxonomytxt,'U')
@@ -16,11 +19,27 @@ def create_dictionary(taxonomytxts):
             pairs_list.append((line.split()[6],line.split()[5]))
             pairs_list.append((line.split()[7],line.split()[6]))
         no_duplicate_list=list(set(pairs_list))
-        dictionary=dict(no_duplicate_list)
-    #print dictionary    
+        taxonomic_rank_dictionary=dict(no_duplicate_list)
     #print dictionary['Portiera;']
-    return dictionary
+    return taxonomic_rank_dictionary
 
+def create_otu_dictionary(otu_files):    
+    if os.path.exists('./otu_db.dir')==True:
+        pass
+    else: 
+        shelf=shelve.open("otu_db",writeback=True)
+        otu_full_list=[] 
+        for i in range(len(otu_files)):
+            print otu_files[i]
+            f=open(otu_files[i],'U')
+            otu_list=f.read().splitlines()
+            otu_list=filter(None,otu_list)
+            for index,item in enumerate(otu_list):
+                if item.startswith('>')==True:
+                    shelf[item.lstrip('>').rstrip('\n')]=otu_list[int(index)+1]
+            f.close()
+        shelf.close()
+    
 
 def split_taxonomy_list(OtuFiles,taxonomy_level,output_dir):
     split_taxonomy={7:'k_taxonomy.txt',6:'p_taxonomy.txt',5:'c_taxonomy.txt',
