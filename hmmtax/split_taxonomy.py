@@ -27,7 +27,7 @@ def create_otu_dictionary(otu_files):
     if os.path.exists('./otu_db.dir')==True:
         pass
     else: 
-        shelf=shelve.open("otu_db",writeback=True)
+        shelf=shelve.open("otu_db")
         otu_full_list=[] 
         for i in range(len(otu_files)):
             print otu_files[i]

@@ -21,7 +21,7 @@ def unique_taxa_collection_at_the_level(taxonomy_file):
     	else:
             ID=line.split('\t')[0]
             name=line.split('\t')[1]
-            if name in ['k__;\t','p__;\t','o__;\t','c__;\t',
+            if name in ['k__;\t','p__\t','o__;\t','c__;\t',
                         'f__;\t','g__;\t','s__\n']:
                 pass
             else:
@@ -196,7 +196,7 @@ def build_hmm_models(level,output_dir):
            	
  
 def assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,splitted_taxonomy_files,output_dir): 
-    otu_dictionary=shelve.open('otu_db',writeback=False)
+    otu_dictionary=shelve.open('otu_db')
     for tf in splitted_taxonomy_files:
         path_to_splitted_taxonomy_file=os.path.join(output_dir,tf)
         utc1=unique_taxa_collection_at_the_level(open(path_to_splitted_taxonomy_file,'U'))
@@ -206,14 +206,12 @@ def assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,splitted_taxon
             ID_NucleoSeq=[]
             for otuID in otuID_list:
                 nucleotide_seq=otu_dictionary[otuID]
-                #print (otuID,nucleotide_seq)
                 if nucleotide_seq!="":
                     ID_NucleoSeq.append(otuID)
                     ID_NucleoSeq.append(nucleotide_seq)
                 else:
                     print "empty"
                     continue
-            #otu_dictionary.sync()
             if taxa_name=='k__Bacteria':
                 predecessor=output_dir
             elif taxa_name=='k__Archaea':
@@ -234,7 +232,8 @@ def assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,splitted_taxon
                 at_fasta_file(ID_NucleoSeq,output_taxonomy_fp)
                 output_sto_fp=os.path.join(path_to_output_dir,taxa_name+'.sto')
                 generate_sto_file(ID_NucleoSeq,output_sto_fp)
-                print 'generate fasta and sto file'
+                print 'generate fasta and sto file:',taxa_name
+            
     otu_dictionary.close()
 
 
