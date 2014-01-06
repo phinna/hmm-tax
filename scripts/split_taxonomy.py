@@ -61,9 +61,9 @@ def main():
        parse_command_line_parameters(**script_info)
      
     sub_taxonomy_list=[]
-    #taxonomic_rank_dictionary=create_taxonomic_rank_dictionary(opts.input_taxonomy_fps)
+    taxonomic_rank_dictionary=create_taxonomic_rank_dictionary(opts.input_taxonomy_fps)
     otu_dictionary=create_otu_dictionary(opts.input_fasta_fps)
-    """
+    
     if opts.taxonomy_level=="":
         if path.isdir(opts.output_dir)==False:
             mkdir(opts.output_dir,0755)
@@ -86,6 +86,6 @@ def main():
             assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,sub_taxonomy_list,opts.output_dir)
  
     build_hmm_models(opts.taxonomy_level,opts.output_dir)
-"""
+
 if __name__ == "__main__":
     main()

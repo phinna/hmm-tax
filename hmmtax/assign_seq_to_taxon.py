@@ -5,7 +5,7 @@
 #                                                #
 ##################################################
 import os
-import shelve
+import bsddb
 import subprocess
 from tempfile import mkstemp
 from qcli import qcli_system_call
@@ -196,7 +196,7 @@ def build_hmm_models(level,output_dir):
            	
  
 def assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,splitted_taxonomy_files,output_dir): 
-    otu_dictionary=shelve.open('otu_db')
+    otu_dictionary=bsddb.hashopen('otu.db')
     for tf in splitted_taxonomy_files:
         path_to_splitted_taxonomy_file=os.path.join(output_dir,tf)
         utc1=unique_taxa_collection_at_the_level(open(path_to_splitted_taxonomy_file,'U'))

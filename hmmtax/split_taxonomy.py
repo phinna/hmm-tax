@@ -4,7 +4,7 @@
 #        and store in several files.           #
 #                                              #
 ################################################
-import shelve
+import bsddb
 import os
 
 def create_taxonomic_rank_dictionary(taxonomytxts):
@@ -23,22 +23,25 @@ def create_taxonomic_rank_dictionary(taxonomytxts):
     #print dictionary['Portiera;']
     return taxonomic_rank_dictionary
 
+def readfiles(filenames):
+    for f in filenames:
+        print f
+        for line in open(f):
+            yield line
+
 def create_otu_dictionary(otu_files):    
-    if os.path.exists('./otu_db.dir')==True:
+    if os.path.exists('./otu.db')==True:
         pass
     else: 
-        shelf=shelve.open("otu_db")
-        otu_full_list=[] 
-        for i in range(len(otu_files)):
-            print otu_files[i]
-            f=open(otu_files[i],'U')
-            otu_list=f.read().splitlines()
-            otu_list=filter(None,otu_list)
-            for index,item in enumerate(otu_list):
-                if item.startswith('>')==True:
-                    shelf[item.lstrip('>').rstrip('\n')]=otu_list[int(index)+1]
-            f.close()
-        shelf.close()
+        db=bsddb.hashopen('otu.db','c')
+        lines=readfiles(otu_files)
+        while True:
+            try:
+                key=lines.next().lstrip('>').rstrip('\n')
+                db[key]=lines.next().rstrip('\n')
+            except StopIteration:
+                break 
+        db.close()
     
 
 def split_taxonomy_list(OtuFiles,taxonomy_level,output_dir):
