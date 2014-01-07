@@ -13,12 +13,12 @@ def create_taxonomic_rank_dictionary(taxonomytxts):
         f=open(taxonomytxt,'U')
         for line in f:
             line=line.split(';')
-            pairs_list.append((line[1],line[0].split()[1]))
-            pairs_list.append((line[2],line[1]))
-            pairs_list.append((line[3],line[2]))
-            pairs_list.append((line[4],line[3]))
-            pairs_list.append((line[5],line[4]))
-            pairs_list.append((line[6],line[5]))
+            pairs_list.append((line[1].strip(),line[0].split('\t')[1]))
+            pairs_list.append((line[2].strip(),line[1].strip()))
+            pairs_list.append((line[3].strip(),line[2].strip()))
+            pairs_list.append((line[4].strip(),line[3].strip()))
+            pairs_list.append((line[5].strip(),line[4].strip()))
+            pairs_list.append((line[6].strip(),line[5].strip()))
         no_duplicate_list=list(set(pairs_list))
         taxonomic_rank_dictionary=dict(no_duplicate_list)
     #print dictionary['Portiera;']

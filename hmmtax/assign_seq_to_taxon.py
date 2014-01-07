@@ -25,7 +25,7 @@ def unique_taxa_collection_at_the_level(taxonomy_file):
                         'f__\t','g__\t','s__\n']:
                 pass
             else:
-                name=name.rstrip(';\n')
+                name=name.strip().rstrip('\n')
                 t_collection_at_the_level.append(name)
     t_collection_at_the_level=list(set(t_collection_at_the_level))
     print t_collection_at_the_level
@@ -39,8 +39,8 @@ def classify_otuID(taxonomy_collection,splitted_taxonomy_file):
     ID_list=[]
     for line in splitted_taxonomy_file:
         ID_name=line.split('\t')
-        if ID_name[1].strip(';\n') in taxonomy_collection:
-            name_list.append(ID_name[1].strip(';\n'))
+        if ID_name[1].strip().rstrip('\n') in taxonomy_collection:
+            name_list.append(ID_name[1].strip().rstrip('\n'))
             ID_list.append(ID_name[0])
     zipped=list(set(zip(name_list,ID_list)))
     #print zipped
@@ -64,6 +64,7 @@ def classify_otuID(taxonomy_collection,splitted_taxonomy_file):
     for t_string in new_t_collection:
         if type(t_string)==str:
             new_t_collection.remove(t_string) 
+    #print new_t_collection
     return new_t_collection
 
 def pick_otuID_from_list(taxonomy,tgroup_list):
