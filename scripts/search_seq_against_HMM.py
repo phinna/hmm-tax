@@ -30,9 +30,10 @@ def create_temp_test_seq_file(temp_dir_name,HMM_choice_list_with_ID,test_seq_fil
         f.close()
     
 def taxonomy_assignment_to_query_seq(Query_dict,Query_collection):
+    f=open('./Query_taxonomy.txt','a')
     for query in Query_collection:
         taxonomy=Query_dict[query]
         t_string=';'.join(taxonomy)
-        f=open('./Query_taxonomy.txt','a')
+        #f=open('./Query_taxonomy.txt','a')
         f.write(query+'\t'+t_string+'\n')
     f.close()

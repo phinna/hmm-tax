@@ -21,8 +21,8 @@ def unique_taxa_collection_at_the_level(taxonomy_file):
     	else:
             ID=line.split('\t')[0]
             name=line.split('\t')[1]
-            if name in ['k__;\t','p__\t','o__;\t','c__;\t',
-                        'f__;\t','g__;\t','s__\n']:
+            if name in ['k__\t','p__\t','o__\t','c__\t',
+                        'f__\t','g__\t','s__\n']:
                 pass
             else:
                 name=name.rstrip(';\n')
@@ -116,9 +116,9 @@ def search_root(taxonomic_rank_dictionary,output_dir,predecessor):
         taxa_strings.append(output_dir)
     else:
         while 1:
-            if predecessor in ['k__Archaea;','k__Bacteria;','Wrong_taxa']:
+            if predecessor in ['k__Archaea','k__Bacteria','Wrong_taxa']:
                 taxa_strings.append(predecessor)
-                taxa_strings.append(output_dir+';')
+                taxa_strings.append(output_dir)
                 break
             else:
                 taxa_strings.append(predecessor)
@@ -126,6 +126,9 @@ def search_root(taxonomic_rank_dictionary,output_dir,predecessor):
     return taxa_strings
 
 def search_dictionary(taxonomy_file,taxonomic_rank_dictionary,search_t):
+    
+    predecessor=taxonomic_rank_dictionary[search_t]
+    """
     if taxonomy_file == 's_taxonomy.txt':
         search_t=search_t.rstrip(';')
         try: 
@@ -137,15 +140,27 @@ def search_dictionary(taxonomy_file,taxonomic_rank_dictionary,search_t):
         try: 
             predecessor=taxonomic_rank_dictionary[search_t]
         except KeyError:
-            print "Oops! KeyError:",search_t
-            predecessor='Wrong_taxa'
+            try:
+                search_t=search_t.rstrip(';')
+                predecessor=taxonomic_rank_dictionary[search_t]
+            except KeyError:
+                #print "Oops! KeyError:",search_t
+                predecessor='Wrong_taxa'
+    """
     return predecessor
 
 def taxa_strings_to_path(taxa_strings):
     result=[]
     for taxa_string in reversed(taxa_strings):
-        result.append(taxa_string.strip(';'))
+        result.append(taxa_string)#.strip(';'))
     return os.path.join(*result)     
+
+def check_path(path):
+    if path.find("'")==-1:
+        path=path.replace("'","\'")
+    else:
+        pass
+    return path 
 
 def build_hmm_models(level,output_dir):
     for roots,dirs,files in os.walk('../scripts/'+output_dir):
@@ -175,9 +190,13 @@ def build_hmm_models(level,output_dir):
                 #subprocess.call(['hmmbuild',path_to_hmm_list[i],path_to_sto_list[i]])
                 stdout,stderr,return_value = qcli_system_call('hmmbuild '+path_to_hmm_list[i]+' '+path_to_sto_list[i])
                 if return_value != 0:
-                    print path_to_sto_list[i]
                     print 'Stdout:\n%s\nStderr:%s\n' % (stdout,stderr)
-                    exit(1)
+                    path_to_sto_list[i]=check_path(path_to_sto_list[i])
+                    path_to_hmm_list[i]=check_path(path_to_hmm_list[i])
+                    print path_to_sto_list[i]
+                    qcli_system_call('hmmbuild '+path_to_hmm_list[i]+' '+path_to_sto_list[i])
+                    
+                    #exit(1)
             content=[]
             for i in range(len(path_to_hmm_list)):
                 try:
@@ -217,7 +236,7 @@ def assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,splitted_taxon
             elif taxa_name=='k__Archaea':
                 predecessor=output_dir
             else:
-                predecessor=search_dictionary(tf,taxonomic_rank_dictionary,taxa_name+';') 
+                predecessor=taxonomic_rank_dictionary[taxa_name] 
             
             taxonomy_strings=search_root(taxonomic_rank_dictionary,output_dir,predecessor)
             path_to_output_dir=taxa_strings_to_path(taxonomy_strings)
