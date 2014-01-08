@@ -16,9 +16,10 @@ def create_taxonomic_rank_dictionary(taxonomytxts):
             pairs_list.append((line[1].strip(),line[0].split('\t')[1]))
             pairs_list.append((line[2].strip(),line[1].strip()))
             pairs_list.append((line[3].strip(),line[2].strip()))
-            pairs_list.append((line[4].strip(),line[3].strip()))
-            pairs_list.append((line[5].strip(),line[4].strip()))
-            pairs_list.append((line[6].strip(),line[5].strip()))
+            pairs_list.append((line[4].replace(" ",""),line[3].replace(" ","")))
+            pairs_list.append((line[5].replace(" ",""),line[4].replace(" ","")))
+            pairs_list.append((line[6].replace(" ","").rstrip('\n'),line[5].replace(" ","")))
+        #print pairs_list
         no_duplicate_list=list(set(pairs_list))
         taxonomic_rank_dictionary=dict(no_duplicate_list)
     #print dictionary['Portiera;']
@@ -88,14 +89,14 @@ def split_taxonomy_list(OtuFiles,taxonomy_level,output_dir):
                     o_list=[head[0],'\t',taxonomy_list[3]]
                     wo.write(''.join(o_list)+'\n')
                 elif taxonomy_level==3:
-                    f_list=[head[0],'\t',taxonomy_list[4]]
+                    f_list=[head[0],'\t',taxonomy_list[4].replace(" ","")]
                     wf.write(''.join(f_list)+'\n')
                 elif taxonomy_level==2:
-                    g_list=[head[0],'\t',taxonomy_list[5]]
+                    g_list=[head[0],'\t',taxonomy_list[5].replace(" ","")]
                     wg.write(''.join(g_list)+'\n')
                 elif taxonomy_level==1:
-                    s_list=[head[0],'\t',taxonomy_list[6]]
-                    ws.write(''.join(s_list)+'\n')
+                    s_list=[head[0],'\t',taxonomy_list[6].replace(" ","")]
+                    ws.write(''.join(s_list))
   	
   
             f.close()

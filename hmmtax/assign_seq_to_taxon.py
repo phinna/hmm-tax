@@ -5,6 +5,7 @@
 #                                                #
 ##################################################
 import os
+import re
 import bsddb
 import subprocess
 from tempfile import mkstemp
@@ -21,14 +22,14 @@ def unique_taxa_collection_at_the_level(taxonomy_file):
     	else:
             ID=line.split('\t')[0]
             name=line.split('\t')[1]
-            if name in ['k__\t','p__\t','o__\t','c__\t',
-                        'f__\t','g__\t','s__\n']:
+            if name in ['k__\n','p__\n','o__\n','c__\n',
+                        'f__\n','g__\n','s__\n']:
                 pass
             else:
                 name=name.strip().rstrip('\n')
                 t_collection_at_the_level.append(name)
     t_collection_at_the_level=list(set(t_collection_at_the_level))
-    print t_collection_at_the_level
+    #print t_collection_at_the_level
     return t_collection_at_the_level
 	
 def classify_otuID(taxonomy_collection,splitted_taxonomy_file):
@@ -126,39 +127,16 @@ def search_root(taxonomic_rank_dictionary,output_dir,predecessor):
                 predecessor=taxonomic_rank_dictionary[predecessor]
     return taxa_strings
 
-def search_dictionary(taxonomy_file,taxonomic_rank_dictionary,search_t):
-    
-    predecessor=taxonomic_rank_dictionary[search_t]
-    """
-    if taxonomy_file == 's_taxonomy.txt':
-        search_t=search_t.rstrip(';')
-        try: 
-            predecessor=taxonomic_rank_dictionary[search_t]
-        except KeyError:
-            search_t=search_t+';'
-            predecessor=taxonomic_rank_dictionary[search_t]
-    else:
-        try: 
-            predecessor=taxonomic_rank_dictionary[search_t]
-        except KeyError:
-            try:
-                search_t=search_t.rstrip(';')
-                predecessor=taxonomic_rank_dictionary[search_t]
-            except KeyError:
-                #print "Oops! KeyError:",search_t
-                predecessor='Wrong_taxa'
-    """
-    return predecessor
 
 def taxa_strings_to_path(taxa_strings):
     result=[]
     for taxa_string in reversed(taxa_strings):
-        result.append(taxa_string)#.strip(';'))
+        result.append(taxa_string)
     return os.path.join(*result)     
 
 def check_path(path):
-    if path.find("'")==-1:
-        path=path.replace("'","\'")
+    if path.find("'")!=-1:
+        path=re.sub('[\']','',path)
     else:
         pass
     return path 
@@ -185,19 +163,17 @@ def build_hmm_models(level,output_dir):
         path_to_hmm_db=os.path.join(roots,'db')
         if db_exist!=[]:
             del db_exist[0]
-            #pass
         elif (db_exist==[] and path_to_sto_list!=[]):
             for i in range(len(path_to_sto_list)):
-                #subprocess.call(['hmmbuild',path_to_hmm_list[i],path_to_sto_list[i]])
                 stdout,stderr,return_value = qcli_system_call('hmmbuild '+path_to_hmm_list[i]+' '+path_to_sto_list[i])
                 if return_value != 0:
-                    print 'Stdout:\n%s\nStderr:%s\n' % (stdout,stderr)
                     path_to_sto_list[i]=check_path(path_to_sto_list[i])
                     path_to_hmm_list[i]=check_path(path_to_hmm_list[i])
-                    print path_to_sto_list[i]
-                    qcli_system_call('hmmbuild '+path_to_hmm_list[i]+' '+path_to_sto_list[i])
-                    
-                    #exit(1)
+                    stdout,stderr,return_value = qcli_system_call('hmmbuild '+path_to_hmm_list[i]+' '+path_to_sto_list[i])
+                    if return_value != 0:
+                        print 'Stdout:\n%s\nStderr:%s\n' % (stdout,stderr)
+                        print path_to_sto_list[i]
+                        #exit(1)
             content=[]
             for i in range(len(path_to_hmm_list)):
                 try:
@@ -230,7 +206,6 @@ def assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,splitted_taxon
                     ID_NucleoSeq.append(otuID)
                     ID_NucleoSeq.append(nucleotide_seq)
                 else:
-                    print "empty"
                     continue
             if taxa_name=='k__Bacteria':
                 predecessor=output_dir
@@ -241,6 +216,7 @@ def assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,splitted_taxon
             
             taxonomy_strings=search_root(taxonomic_rank_dictionary,output_dir,predecessor)
             path_to_output_dir=taxa_strings_to_path(taxonomy_strings)
+            path_to_output_dir=check_path(path_to_output_dir)
             if ID_NucleoSeq==[]:
                 pass
             else:
@@ -249,8 +225,10 @@ def assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,splitted_taxon
                 else:
                     pass
                 output_taxonomy_fp=os.path.join(path_to_output_dir,taxa_name+'.fasta')
+                output_taxonomy_fp=check_path(output_taxonomy_fp)
                 at_fasta_file(ID_NucleoSeq,output_taxonomy_fp)
                 output_sto_fp=os.path.join(path_to_output_dir,taxa_name+'.sto')
+                output_sto_fp=check_path(output_sto_fp)
                 generate_sto_file(ID_NucleoSeq,output_sto_fp)
                 print 'generate fasta and sto file:',taxa_name
             
