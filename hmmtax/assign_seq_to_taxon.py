@@ -136,9 +136,14 @@ def taxa_strings_to_path(taxa_strings):
 
 def check_path(path):
     if path.find("'")!=-1:
-        path=re.sub('[\']','',path)
+        #path=re.sub('[\']','',path)
+	path=path.replace("'","\'")
+    elif path.find(" ") != -1:
+	path=path.replace(" ","\ ")
+    elif path.find(".",0, len(path)-4) != -1:
+	path=path.replace(".","\.")
     else:
-        pass
+	pass
     return path 
 
 def build_hmm_models(level,output_dir):
@@ -167,9 +172,11 @@ def build_hmm_models(level,output_dir):
             for i in range(len(path_to_sto_list)):
                 stdout,stderr,return_value = qcli_system_call('hmmbuild '+path_to_hmm_list[i]+' '+path_to_sto_list[i])
                 if return_value != 0:
-                    path_to_sto_list[i]=check_path(path_to_sto_list[i])
-                    path_to_hmm_list[i]=check_path(path_to_hmm_list[i])
-                    stdout,stderr,return_value = qcli_system_call('hmmbuild '+path_to_hmm_list[i]+' '+path_to_sto_list[i])
+                    #path_to_sto_list[i]=check_path(path_to_sto_list[i])
+                    new_path_to_sto=check_path(path_to_sto_list[i])
+                    #path_to_hmm_list[i]=check_path(path_to_hmm_list[i])
+                    new_path_to_hmm=check_path(path_to_hmm_list[i])
+                    stdout,stderr,return_value = qcli_system_call('hmmbuild '+new_path_to_hmm+' '+new_path_to_sto)
                     if return_value != 0:
                         print 'Stdout:\n%s\nStderr:%s\n' % (stdout,stderr)
                         print path_to_sto_list[i]
@@ -182,8 +189,11 @@ def build_hmm_models(level,output_dir):
                     f.close()
                 except IOError:
                     print path_to_hmm_list[i]
-            f=open(path_to_hmm_db,'w')
+            print "content_length:",len(content)
+	    f=open(path_to_hmm_db,'w')
+	    print path_to_hmm_list 
             for i in range(len(path_to_hmm_list)):
+		print len(path_to_hmm_list)
                 f.write(content[i])
             f.close()
             subprocess.call(['hmmpress',path_to_hmm_db])
@@ -216,7 +226,7 @@ def assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,splitted_taxon
             
             taxonomy_strings=search_root(taxonomic_rank_dictionary,output_dir,predecessor)
             path_to_output_dir=taxa_strings_to_path(taxonomy_strings)
-            path_to_output_dir=check_path(path_to_output_dir)
+            #path_to_output_dir=check_path(path_to_output_dir)
             if ID_NucleoSeq==[]:
                 pass
             else:
@@ -225,10 +235,10 @@ def assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,splitted_taxon
                 else:
                     pass
                 output_taxonomy_fp=os.path.join(path_to_output_dir,taxa_name+'.fasta')
-                output_taxonomy_fp=check_path(output_taxonomy_fp)
+                #output_taxonomy_fp=check_path(output_taxonomy_fp)
                 at_fasta_file(ID_NucleoSeq,output_taxonomy_fp)
                 output_sto_fp=os.path.join(path_to_output_dir,taxa_name+'.sto')
-                output_sto_fp=check_path(output_sto_fp)
+                #output_sto_fp=check_path(output_sto_fp)
                 generate_sto_file(ID_NucleoSeq,output_sto_fp)
                 print 'generate fasta and sto file:',taxa_name
             

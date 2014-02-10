@@ -48,7 +48,7 @@ def main():
     temp_dir_name=tempfile.mkdtemp(prefix='root_')
     level=0
     for root,dirs,files in os.walk(opts.input_HMM_fp):
-        #print root
+        print root
         #print dirs
         #print files
         #print ".................."
