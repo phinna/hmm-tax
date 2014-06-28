@@ -12,14 +12,10 @@ def search_HMM(HMM_result):
             Query=line.split()[1]
             HMM_Query_list.append(Query)
             count_line=0
-        if count_line==6 and line.startswith('#')==False:
+        if count_line==5 and line.startswith('#')==False:
             newlist=line.lstrip().split()
             if len(newlist)>=8:
-                rank=line.lstrip().split()[8]
-                if rank in ['k__Bacteria_1','k__Bacteria_2','k__Bacteria_3']:
-                    rank='k__Bacteria'
-                else:
-                    pass
+                rank=line.lstrip().split()[5]
             else:
                 rank='None'
             HMM_choice_list.append(rank)
@@ -29,6 +25,8 @@ def search_HMM(HMM_result):
     return HMM_choice_list,HMM_Query_list,HMM_choice_list_with_ID
 
 def create_temp_test_seq_file(temp_dir_name,HMM_choice_list_with_ID,test_seq_file):
+    """Create the temporary test sequence file \
+       for each group at each level"""
     for line in test_seq_file:
         if line.startswith('>'):
             newline=line.split() 
@@ -41,9 +39,10 @@ def create_temp_test_seq_file(temp_dir_name,HMM_choice_list_with_ID,test_seq_fil
         f.write(line)
         f.close()
     
-def taxonomy_assignment_to_query_seq(Query_dict,Query_collection):
-    
-    f=open('./Query_taxonomy.txt','w')
+def taxonomy_assignment_to_query_seq(Query_dict,Query_collection,output_fp):
+    """Output the taxonomy assignments of the query sequences \
+       found in the profile HMM database to the file"""
+    f=open('./'+output_fp,'w')
     for query in Query_collection:
         taxonomy=Query_dict[query]
         t_string=';'.join(taxonomy)

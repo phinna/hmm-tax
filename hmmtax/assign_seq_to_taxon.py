@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 ##################################################
 # Topic: Match each otu ID to its                #
-#	 corresponding nucleotide sequence       #
+#	 corresponding nucleotide sequence           #
 #                                                #
 ##################################################
 import os
@@ -12,9 +12,12 @@ from tempfile import mkstemp
 from qcli import qcli_system_call
 
 def unique_taxa_collection_at_the_level(taxonomy_file):    
-    """
-    Filter repeated otu IDs in a taxonomy file which is at a specified taxonomic level and return a list of a unique taxonomy collection.
-    """  
+    
+    """Filter out the repeated otu IDs in the taxonomy \
+       file which is at a specified taxonomic \
+       level and return a list of a unique \
+       taxonomy collection."""
+  
     t_collection_at_the_level=[]
     for line in taxonomy_file:
         if line=="":
@@ -33,9 +36,12 @@ def unique_taxa_collection_at_the_level(taxonomy_file):
     return t_collection_at_the_level
 	
 def classify_otuID(taxonomy_collection,splitted_taxonomy_file):
-    """
-    Classify otu IDs based on each taxonomy at a specified taxonomy level and return a list which conains otu IDs and the corresponding taxonomy.
-    """
+    
+    """Classify otu IDs based on each taxonomy \
+       at a specified taxonomy level and return \
+       a list which conains otu IDs and the \
+       corresponding taxonomy."""
+
     name_list=[]
     ID_list=[]
     for line in splitted_taxonomy_file:
@@ -44,7 +50,6 @@ def classify_otuID(taxonomy_collection,splitted_taxonomy_file):
             name_list.append(ID_name[1].strip().rstrip('\n'))
             ID_list.append(ID_name[0])
     zipped=list(set(zip(name_list,ID_list)))
-    #print zipped
     new_t_collection=[]
     for tuple_element in zipped:
         if tuple_element[0] not in new_t_collection:
@@ -69,9 +74,11 @@ def classify_otuID(taxonomy_collection,splitted_taxonomy_file):
     return new_t_collection
 
 def pick_otuID_from_list(taxonomy,tgroup_list):
-    """
-    Pick and return a otu ID from a list which contains a sequence of otu IDs under    a specified taxonomy group.
-    """
+    
+    """Pick and return an otu ID from a list \
+       which contains a sequence of otu IDs under \    
+       a specified taxonomy group."""
+
     otuID=[]
     for n in range(0,len(tgroup_list)):
         if taxonomy==tgroup_list[n][0]:
@@ -83,9 +90,10 @@ def pick_otuID_from_list(taxonomy,tgroup_list):
     return otuID
 
 def at_fasta_file(ID_NucleoSeq,output_fp):
-    """
-    Write the otu ID and its corresponding nucleotide sequence into a .fasta file. 
-    """
+    
+    """Write the otu ID and its corresponding \
+       nucleotide sequence into a .fasta file."""
+
     if len(ID_NucleoSeq)!=[]:
         output_f=open(output_fp,'w')
         for i in range(0,len(ID_NucleoSeq)):
@@ -98,9 +106,9 @@ def at_fasta_file(ID_NucleoSeq,output_fp):
         print 'No fasta file generated'
 
 def generate_sto_file(ID_NucleoSeq,output_fp):
-    """
-    Create a sto file with otu ID and its nucleotide sequence.
-    """
+    
+    """Create a sto file with otu ID and its nucleotide sequence."""
+
     if len(ID_NucleoSeq)!=0:
         output_f=open(output_fp,'w')
         output_f.write('# STOCKHOLM 1.0\n\n')
@@ -113,6 +121,9 @@ def generate_sto_file(ID_NucleoSeq,output_fp):
         output_f.close()
 
 def search_root(taxonomic_rank_dictionary,output_dir,predecessor):
+    
+    """Look for the predecessors of the taxa"""
+    
     taxa_strings=[]
     if predecessor == output_dir:
         taxa_strings.append(output_dir)
@@ -125,33 +136,59 @@ def search_root(taxonomic_rank_dictionary,output_dir,predecessor):
             else:
                 taxa_strings.append(predecessor)
                 predecessor=taxonomic_rank_dictionary[predecessor]
+    
     return taxa_strings
 
 
 def taxa_strings_to_path(taxa_strings):
+
+    """Put separated strings together """
+
     result=[]
     for taxa_string in reversed(taxa_strings):
         result.append(taxa_string)
+    
     return os.path.join(*result)     
 
 def check_path(path):
+
+    """Any special character found in the path \ 
+       need to add the slash in front of them"""
+    
     if path.find("'")!=-1:
-        #path=re.sub('[\']','',path)
-	path=path.replace("'","\'")
+	    path=path.replace("'","\'")
     elif path.find(" ") != -1:
-	path=path.replace(" ","\ ")
+	    path=path.replace(" ","\ ")
     elif path.find(".",0, len(path)-4) != -1:
-	path=path.replace(".","\.")
+	    path=path.replace(".","\.")
     else:
-	pass
+	    pass
+    
+    return path 
+
+def check_python_path(path):
+   
+    """The white spaces in the python path do not \
+       have to add slash"""
+
+    if path.find("'")!=-1:
+	    path=path.replace("'","\'")
+    elif path.find(" ") != -1:
+	    path=path.replace(" "," ")
+    elif path.find(".",0, len(path)-4) != -1:
+	    path=path.replace(".","\.")
+    else:
+	    pass
+    
     return path 
 
 def build_hmm_models(level,output_dir):
-    for roots,dirs,files in os.walk('../scripts/'+output_dir):
-        #print roots
-        #print dirs
-        #print files
-        #print '===================================='
+
+    """Walk through every file in the directory \
+       to look for the .sto files. If the .sto files \
+       are found, 'hmmbuild' and 'hmmpress' them."""
+
+    for roots,dirs,files in os.walk(output_dir):        
         path_to_sto_list=[]
         path_to_hmm_list=[]
         path_to_dir=[]
@@ -172,15 +209,12 @@ def build_hmm_models(level,output_dir):
             for i in range(len(path_to_sto_list)):
                 stdout,stderr,return_value = qcli_system_call('hmmbuild '+path_to_hmm_list[i]+' '+path_to_sto_list[i])
                 if return_value != 0:
-                    #path_to_sto_list[i]=check_path(path_to_sto_list[i])
                     new_path_to_sto=check_path(path_to_sto_list[i])
-                    #path_to_hmm_list[i]=check_path(path_to_hmm_list[i])
                     new_path_to_hmm=check_path(path_to_hmm_list[i])
                     stdout,stderr,return_value = qcli_system_call('hmmbuild '+new_path_to_hmm+' '+new_path_to_sto)
                     if return_value != 0:
                         print 'Stdout:\n%s\nStderr:%s\n' % (stdout,stderr)
-                        print path_to_sto_list[i]
-                        #exit(1)
+                        exit(1)
             content=[]
             for i in range(len(path_to_hmm_list)):
                 try:
@@ -189,19 +223,101 @@ def build_hmm_models(level,output_dir):
                     f.close()
                 except IOError:
                     print path_to_hmm_list[i]
-            print "content_length:",len(content)
-	    f=open(path_to_hmm_db,'w')
-	    print path_to_hmm_list 
+	        f=open(path_to_hmm_db,'w')
             for i in range(len(path_to_hmm_list)):
-		print len(path_to_hmm_list)
                 f.write(content[i])
             f.close()
             subprocess.call(['hmmpress',path_to_hmm_db])
         else:
             pass
            	
+def build_cm_models(output_dir):
+    
+    """Walk through the directory to look for the .sto files. \
+       If the .sto files are founded, 'cmbuild' the files"""
+
+    for roots,dirs,files in os.walk(output_dir):
+        path_to_sto_list=[]
+        path_to_cm_list=[]
+        path_to_dir=[]
+        db_exist=[]
+        for name in dirs:
+            path_to_dir.append(os.path.join(roots,name))
+        for name in files:
+            fileName, fileExtension = os.path.splitext(name)
+            if fileExtension=='.sto':
+                path_to_sto_list.append(os.path.join(roots,name))
+                path_to_cm_list.append(os.path.join(roots,fileName+'.cm'))
+            elif fileName=='db':
+                db_exist.append('True')
+        path_to_cm_db=os.path.join(roots,'db')
+        if db_exist!=[]:
+            del db_exist[0]
+        elif (db_exist==[] and path_to_sto_list!=[]):
+            for i in range(len(path_to_sto_list)):
+                new_path_to_sto=check_path(path_to_sto_list[i])
+                new_path_to_cm=check_path(path_to_cm_list[i])
+                stdout,stderr,return_value = qcli_system_call('cmbuild --noss -F '+path_to_cm_list[i]+' '+path_to_sto_list[i])
+                if return_value != 0:
+                    print 'Stdout:\n%s\nStderr:%s\n' % (stdout,stderr)
+                    exit(1)
+	        f=open(path_to_cm_db,'w')
+            f.close()
+        else:
+            pass
+
+def search_cmfiles_to_cmpress(output_dir):
+    
+    """Walk through every file in the directory \
+       to look for .cm file. If the .cm file is \
+       found, 'cmpress' this file."""
+
+    for roots,dirs,files in os.walk(output_dir):
+        path_to_cm_list=[]
+        path_to_dir=[]
+        db_exist=[]
+        for name in dirs:
+            path_to_dir.append(os.path.join(roots,name))
+        for name in files:
+            fileName, fileExtension = os.path.splitext(name)
+            if fileExtension=='.cm':
+                path_to_cm_list.append(os.path.join(roots,fileName+'.cm'))
+            elif fileName=='db':
+                db_exist.append('True')
+        path_to_cm_db=os.path.join(roots,'db')
+        if db_exist!=[]:
+            del db_exist[0]
+        elif (db_exist==[] and path_to_cm_list!=[]):
+            for i in range(len(path_to_cm_list)):
+                new_path_to_cm=check_path(path_to_cm_list[i])
+                print new_path_to_cm
+	        f=open(path_to_cm_db,'w')
+            f.close()
+            cmpress_models(path_to_cm_db,path_to_cm_list)
+        else:
+            pass
+        cmpress_models(path_to_cm_db,path_to_cm_list)
+
+def cmpress_models(path_to_cm_db,path_to_cm_list):
+    content=[]
+    for i in range(len(path_to_cm_list)):
+        try:
+            new_path_to_cm=check_python_path(path_to_cm_list[i])
+            f=open(new_path_to_cm,'U')
+            content.append(f.read())
+            f.close()
+        except IOError:
+            print new_path_to_cm
+	f=open(path_to_cm_db,'w')
+    for i in range(len(path_to_cm_list)):
+        f.write(content[i])
+    f.close()
+    subprocess.call(['cmpress',path_to_cm_db])
  
-def assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,splitted_taxonomy_files,output_dir): 
+
+
+def assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,splitted_taxonomy_files,output_dir):
+ 
     otu_dictionary=bsddb.hashopen('otu.db')
     for tf in splitted_taxonomy_files:
         path_to_splitted_taxonomy_file=os.path.join(output_dir,tf)
@@ -245,17 +361,5 @@ def assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,splitted_taxon
     otu_dictionary.close()
 
 
-def main():
-    
-    splitted_taxonomy_files=['c_taxonomy.txt','f_taxonomy.txt','g_taxonomy.txt',
-                    'k_taxonomy.txt','o_taxonomy.txt','p_taxonomy.txt','s_taxonomy.txt']
-    otu_files=['61_otus.fasta','64_otus.fasta','67_otus.fasta','70_otus.fasta',
-               '73_otus.fasta','76_otus.fasta','79_otus.fasta','82_otus.fasta',
-               '85_otus.fasta','88_otus.fasta','91_otus.fasta','94_otus.fasta',
-               '97_otus.fasta','99_otus.fasta']
-    assign_otuID_to_seqs(splitted_taxonomy_files,otu_files,output_dir) 
-  
-if __name__=="__main__":
-    main()
 
 

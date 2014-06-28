@@ -16,7 +16,7 @@ from hmmtax.split_taxonomy import split_taxonomy_list
 from hmmtax.split_taxonomy import create_taxonomic_rank_dictionary
 from hmmtax.split_taxonomy import create_otu_dictionary
 from hmmtax.assign_seq_to_taxon import assign_otuID_to_seqs
-from hmmtax.assign_seq_to_taxon import  build_hmm_models
+from hmmtax.assign_seq_to_taxon import  build_hmm_models,build_cm_models
 from qcli import qcli_system_call
 from qcli import (parse_command_line_parameters, 
                   make_option)
@@ -85,7 +85,7 @@ def main():
             sub_taxonomy_list.append(sub_taxonomy)
             assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,sub_taxonomy_list,opts.output_dir)
  
-    build_hmm_models(opts.taxonomy_level,opts.output_dir)
+    build_cm_models(opts.output_dir)
 
 if __name__ == "__main__":
     main()
