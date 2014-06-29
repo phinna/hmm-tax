@@ -26,35 +26,34 @@ class HMMTest(unittest.TestCase):
     
     def setUp(self):
 
-        #self.dirs_to_remove = []
-	    self.subSeq_dir=tempfile.mkdtemp(prefix='root_')
-	    
-	    self.querySeq_f=get_tmp_filename(
-	        prefix='querySeqTest',suffix='fna')
-        
-	    self.queryOut_f=get_tmp_filename(
-            prefix='queryOutTest',suffix='txt')
+    	self.dirs_to_remove = []
+	
+	self.subSeq_dir=tempfile.mkdtemp(prefix='root_')
+	self.querySeq_f=get_tmp_filename(
+	    prefix='querySeqTest',suffix='fna')
+        self.queryOut_f=get_tmp_filename(
+        prefix='queryOutTest',suffix='txt')
        
-	    self._paths_to_clean_up=\
-	        [self.querySeq_f,self.queryOut_f]
-        #self.dirs_to_remove.append(slf.subSeq_dir)        
+	self._paths_to_clean_up=\
+	    [self.querySeq_f,self.queryOut_f]
+        self.dirs_to_remove.append(self.subSeq_dir)        
 
-	    querySeq_file=open(self.querySeq_f,'w')
-	    queryOut_file=open(self.queryOut_f,'w')
+	querySeq_file=open(self.querySeq_f,'w')
+	queryOut_file=open(self.queryOut_f,'w')
 	
-	    querySeq_file.write(query_seq_lines)
+	querySeq_file.write(query_seq_lines)
 	
-	    querySeq_file.close()
-	    queryOut_file.close()
+	querySeq_file.close()
+	queryOut_file.close()
 
     
 		
     def tearDown(self):
 	
-	    remove_files(set(self._paths_to_clean_up))
-        #for d in self.dirs_to_remove:
-        #    if exists(d):
-        #        rmtree(d)
+	remove_files(set(self._paths_to_clean_up))
+        for d in self.dirs_to_remove:
+            if exists(d):
+                rmtree(d)
     
     def test_search_HMM(self):
         
