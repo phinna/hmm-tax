@@ -158,79 +158,14 @@ def check_path(path):
     if path.find("'")!=-1:
 	    path=path.replace("'","\'")
     elif path.find(" ") != -1:
-	    path=path.replace(" ","\ ")
-    elif path.find(".",0, len(path)-4) != -1:
-	    path=path.replace(".","\.")
-    else:
-	    pass
-    
-    return path 
-
-def check_python_path(path):
-   
-    """The white spaces in the python path do not \
-       have to add slash"""
-
-    if path.find("'")!=-1:
-	    path=path.replace("'","\'")
-    elif path.find(" ") != -1:
 	    path=path.replace(" "," ")
     elif path.find(".",0, len(path)-4) != -1:
 	    path=path.replace(".","\.")
     else:
 	    pass
-    
-    return path 
 
-def build_hmm_models(level,output_dir):
+    return path
 
-    """Walk through every file in the directory \
-       to look for the .sto files. If the .sto files \
-       are found, 'hmmbuild' and 'hmmpress' them."""
-
-    for roots,dirs,files in os.walk(output_dir):        
-        path_to_sto_list=[]
-        path_to_hmm_list=[]
-        path_to_dir=[]
-        db_exist=[]
-        for name in dirs:
-            path_to_dir.append(os.path.join(roots,name))
-        for name in files:
-            fileName, fileExtension = os.path.splitext(name)
-            if fileExtension=='.sto':
-                path_to_sto_list.append(os.path.join(roots,name))
-                path_to_hmm_list.append(os.path.join(roots,fileName+'.hmm'))
-            elif fileName=='db':
-                db_exist.append('True')
-        path_to_hmm_db=os.path.join(roots,'db')
-        if db_exist!=[]:
-            del db_exist[0]
-        elif (db_exist==[] and path_to_sto_list!=[]):
-            for i in range(len(path_to_sto_list)):
-                stdout,stderr,return_value = qcli_system_call('hmmbuild '+path_to_hmm_list[i]+' '+path_to_sto_list[i])
-                if return_value != 0:
-                    new_path_to_sto=check_path(path_to_sto_list[i])
-                    new_path_to_hmm=check_path(path_to_hmm_list[i])
-                    stdout,stderr,return_value = qcli_system_call('hmmbuild '+new_path_to_hmm+' '+new_path_to_sto)
-                    if return_value != 0:
-                        print 'Stdout:\n%s\nStderr:%s\n' % (stdout,stderr)
-                        exit(1)
-            content=[]
-            for i in range(len(path_to_hmm_list)):
-                try:
-                    f=open(path_to_hmm_list[i],'U')
-                    content.append(f.read())
-                    f.close()
-                except IOError:
-                    print path_to_hmm_list[i]
-	        f=open(path_to_hmm_db,'w')
-            for i in range(len(path_to_hmm_list)):
-                f.write(content[i])
-            f.close()
-            subprocess.call(['hmmpress',path_to_hmm_db])
-        else:
-            pass
-           	
 def build_cm_models(output_dir):
     
     """Walk through the directory to look for the .sto files. \
@@ -302,7 +237,7 @@ def cmpress_models(path_to_cm_db,path_to_cm_list):
     content=[]
     for i in range(len(path_to_cm_list)):
         try:
-            new_path_to_cm=check_python_path(path_to_cm_list[i])
+            new_path_to_cm=check_path(path_to_cm_list[i])
             f=open(new_path_to_cm,'U')
             content.append(f.read())
             f.close()
@@ -342,7 +277,7 @@ def assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,splitted_taxon
             
             taxonomy_strings=search_root(taxonomic_rank_dictionary,output_dir,predecessor)
             path_to_output_dir=taxa_strings_to_path(taxonomy_strings)
-            #path_to_output_dir=check_path(path_to_output_dir)
+            path_to_output_dir=check_path(path_to_output_dir)
             if ID_NucleoSeq==[]:
                 pass
             else:
@@ -351,10 +286,10 @@ def assign_otuID_to_seqs(taxonomic_rank_dictionary,otu_dictionary,splitted_taxon
                 else:
                     pass
                 output_taxonomy_fp=os.path.join(path_to_output_dir,taxa_name+'.fasta')
-                #output_taxonomy_fp=check_path(output_taxonomy_fp)
+                output_taxonomy_fp=check_path(output_taxonomy_fp)
                 at_fasta_file(ID_NucleoSeq,output_taxonomy_fp)
                 output_sto_fp=os.path.join(path_to_output_dir,taxa_name+'.sto')
-                #output_sto_fp=check_path(output_sto_fp)
+                output_sto_fp=check_path(output_sto_fp)
                 generate_sto_file(ID_NucleoSeq,output_sto_fp)
                 print 'generate fasta and sto file:',taxa_name
             
